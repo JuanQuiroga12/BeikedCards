@@ -36,7 +36,6 @@ public class StoryCollection : MonoBehaviour
             {
                 layout = commonCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
                 layout.spacing = 10;
-                layout.childAlignment = TextAnchor.MiddleCenter;
                 layout.childForceExpandWidth = false;
                 layout.childForceExpandHeight = false;
             }
@@ -60,7 +59,6 @@ public class StoryCollection : MonoBehaviour
             {
                 layout = commonCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
                 layout.spacing = 10;
-                layout.childAlignment = TextAnchor.MiddleCenter;
                 layout.childForceExpandWidth = false;
                 layout.childForceExpandHeight = false;
             }
@@ -414,7 +412,6 @@ public class StoryCollection : MonoBehaviour
                 layout = commonCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
             }
 
-            layout.childAlignment = TextAnchor.MiddleCenter;
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
         }
@@ -434,7 +431,6 @@ public class StoryCollection : MonoBehaviour
                 layout = strangeCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
             }
 
-            layout.childAlignment = TextAnchor.MiddleCenter;
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
         }
@@ -455,7 +451,6 @@ public class StoryCollection : MonoBehaviour
                 layout = deluxeCardContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
             }
 
-            layout.childAlignment = TextAnchor.MiddleCenter;
             layout.childForceExpandWidth = false;
             layout.childForceExpandHeight = false;
         }
