@@ -1297,7 +1297,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1323259732
 Canvas:
   m_ObjectHideFlags: 0
@@ -1307,7 +1307,7 @@ Canvas:
   m_GameObject: {fileID: 1323259729}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 1
+  m_RenderMode: 2
   m_Camera: {fileID: 1092682236}
   m_PlaneDistance: 100
   m_PixelPerfect: 0
@@ -1329,8 +1329,8 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1323259729}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 90}
+  m_LocalScale: {x: 0.060140654, y: 0.060140654, z: 0.060140654}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1060952324}
@@ -1341,21 +1341,9 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
---- !u!114 &1422467932 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 4277025301406636081, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
-    type: 3}
-  m_PrefabInstance: {fileID: 3998160184055444871}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_AnchoredPosition: {x: 0, y: 1}
+  m_SizeDelta: {x: 1080, y: 1920}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1581204664
 GameObject:
   m_ObjectHideFlags: 0
@@ -1625,10 +1613,10 @@ MonoBehaviour:
   m_Padding:
     m_Left: 20
     m_Right: 20
-    m_Top: 20
+    m_Top: 100
     m_Bottom: 20
   m_ChildAlignment: 1
-  m_Spacing: 30
+  m_Spacing: 500
   m_ChildForceExpandWidth: 1
   m_ChildForceExpandHeight: 0
   m_ChildControlWidth: 1
@@ -2282,22 +2270,26 @@ PrefabInstance:
       propertyPath: m_Name
       value: CardSlot
       objectReference: {fileID: 0}
-    - target: {fileID: 7317645794457027731, guid: 8f1bc9908c0e24042b330e8326c72035,
+    - target: {fileID: 6749539282052642278, guid: 8f1bc9908c0e24042b330e8326c72035,
         type: 3}
-      propertyPath: cardModelContainer
+      propertyPath: m_Camera
       value: 
-      objectReference: {fileID: 2320989492419709883}
+      objectReference: {fileID: 1092682236}
+    - target: {fileID: 7914515179807167776, guid: 8f1bc9908c0e24042b330e8326c72035,
+        type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 175
+      objectReference: {fileID: 0}
+    - target: {fileID: 7914515179807167776, guid: 8f1bc9908c0e24042b330e8326c72035,
+        type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 300
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 8f1bc9908c0e24042b330e8326c72035, type: 3}
---- !u!224 &2320989492419709883 stripped
-RectTransform:
-  m_CorrespondingSourceObject: {fileID: 7914515179807167776, guid: 8f1bc9908c0e24042b330e8326c72035,
-    type: 3}
-  m_PrefabInstance: {fileID: 2320989492419709882}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &3998160184055444871
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2311,11 +2303,6 @@ PrefabInstance:
       propertyPath: cardSlotPrefab
       value: 
       objectReference: {fileID: 1610539298}
-    - target: {fileID: -77277090126852910, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
-        type: 3}
-      propertyPath: storyTitleText
-      value: 
-      objectReference: {fileID: 1422467932}
     - target: {fileID: 327157807546103806, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
         type: 3}
       propertyPath: m_Pivot.x
@@ -2349,12 +2336,12 @@ PrefabInstance:
     - target: {fileID: 327157807546103806, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 960
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 327157807546103806, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
         type: 3}
       propertyPath: m_SizeDelta.y
-      value: 620
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 327157807546103806, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
         type: 3}
@@ -2416,11 +2403,26 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 954243719835379198, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
+        type: 3}
+      propertyPath: m_Spacing
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 954243719835379198, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
+        type: 3}
+      propertyPath: m_Padding.m_Top
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1172723681179567255, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
         type: 3}
       propertyPath: m_Name
       value: StoryCollection
       objectReference: {fileID: 0}
+    - target: {fileID: 6246333234986104589, guid: 8ad9e6396898b1e478ef698d5cdf87fa,
+        type: 3}
+      propertyPath: m_Camera
+      value: 
+      objectReference: {fileID: 1092682236}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

@@ -19,10 +19,69 @@ public class StoryCollection : MonoBehaviour
     private Dictionary<string, CardSlot> cardSlots = new Dictionary<string, CardSlot>();
     private bool hasAnyCards = false;
 
+    private void Start()
+    {
+        // Configurar contenedores de cartas con tamaños apropiados
+        if (commonCardsContainer != null)
+        {
+            RectTransform rectTransform = commonCardsContainer.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.sizeDelta = new Vector2(800, 200); // Ancho, Alto
+            }
+
+            // Agregar horizontal layout group si no existe
+            HorizontalLayoutGroup layout = commonCardsContainer.GetComponent<HorizontalLayoutGroup>();
+            if (layout == null)
+            {
+                layout = commonCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
+                layout.spacing = 10;
+                layout.childAlignment = TextAnchor.MiddleCenter;
+                layout.childForceExpandWidth = false;
+                layout.childForceExpandHeight = false;
+            }
+        }
+
+        // Similar para strangeCardsContainer y deluxeCardContainer
+        // ...
+
+        // Configurar contenedores de cartas con tamaños apropiados
+        if (commonCardsContainer != null)
+        {
+            RectTransform rectTransform = strangeCardsContainer.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.sizeDelta = new Vector2(800, 200); // Ancho, Alto
+            }
+
+            // Agregar horizontal layout group si no existe
+            HorizontalLayoutGroup layout = strangeCardsContainer.GetComponent<HorizontalLayoutGroup>();
+            if (layout == null)
+            {
+                layout = commonCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
+                layout.spacing = 10;
+                layout.childAlignment = TextAnchor.MiddleCenter;
+                layout.childForceExpandWidth = false;
+                layout.childForceExpandHeight = false;
+            }
+        }
+
+        if (commonCardsContainer != null)
+        {
+            RectTransform rectTransform = deluxeCardContainer.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.sizeDelta = new Vector2(800, 200); // Ancho, Alto
+            }
+        }
+    }
+
     public void Initialize(string id, string title, Dictionary<string, string> cardToPrefabMap)
     {
         this.storyId = id;
         storyTitleText.text = title;
+
+        ConfigureCardContainers();
 
         // Cargar todas las cartas de esta colección
         LoadStoryCards(cardToPrefabMap);
@@ -37,6 +96,8 @@ public class StoryCollection : MonoBehaviour
         // Inicialmente ocultar botones
         redeemButton.gameObject.SetActive(isComplete && !HasCookieCode());
         viewCodeButton.gameObject.SetActive(isComplete && HasCookieCode());
+
+        DebugCardData();
     }
 
     private void LoadStoryCards(Dictionary<string, string> cardToPrefabMap)
@@ -261,7 +322,7 @@ public class StoryCollection : MonoBehaviour
             // Añadir componentes UI
             RectTransform rt = codePanel.AddComponent<RectTransform>();
             rt.anchorMin = new Vector2(0.5f, 0.5f);
-            rt.anchorMax = new Vector2(0.5f, 0.5f);
+            rt.anchorMax = new Vector2(1080.0f, 1920.0f);
             rt.pivot = new Vector2(0.5f, 0.5f);
             rt.sizeDelta = new Vector2(400, 300);
 
@@ -313,6 +374,90 @@ public class StoryCollection : MonoBehaviour
 
             // Evento de cierre
             closeButton.onClick.AddListener(() => Destroy(codePanel));
+        }
+    }
+
+    private void DebugCardData()
+    {
+        // Obtener las cartas de esta historia
+        List<Card> storyCards = DataManager.GetCardsByStory(storyId);
+
+        // Imprimir información
+        Debug.Log($"Historia: {storyId}, Título: {storyTitleText.text}");
+        Debug.Log($"Total de cartas para esta historia: {(storyCards != null ? storyCards.Count : 0)}");
+
+        if (storyCards != null)
+        {
+            foreach (Card card in storyCards)
+            {
+                Debug.Log($"Carta: {card.id}, Tipo: {card.type}, Parte: {card.storyPart}, Nombre: {card.name}");
+            }
+        }
+    }
+
+    private void ConfigureCardContainers()
+    {
+        // Configurar contenedor para Common Cards
+        if (commonCardsContainer != null)
+        {
+            // Asegurarse de que tiene un RectTransform adecuado
+            RectTransform rectTransform = commonCardsContainer.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.sizeDelta = new Vector2(800, 150);
+            }
+
+            // Configurar HorizontalLayoutGroup
+            HorizontalLayoutGroup layout = commonCardsContainer.GetComponent<HorizontalLayoutGroup>();
+            if (layout == null)
+            {
+                layout = commonCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
+            }
+
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+        }
+
+        // Configuración similar para Strange y Deluxe
+        if (strangeCardsContainer != null)
+        {
+            RectTransform rectTransform = strangeCardsContainer.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.sizeDelta = new Vector2(800, 150);
+            }
+
+            HorizontalLayoutGroup layout = strangeCardsContainer.GetComponent<HorizontalLayoutGroup>();
+            if (layout == null)
+            {
+                layout = strangeCardsContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
+            }
+
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
+        }
+
+        if (deluxeCardContainer != null)
+        {
+            RectTransform rectTransform = deluxeCardContainer.GetComponent<RectTransform>();
+            if (rectTransform != null)
+            {
+                rectTransform.sizeDelta = new Vector2(800, 150);
+            }
+
+            // Para el contenedor de Deluxe, podríamos usar HorizontalLayoutGroup también
+            // para mantener consistencia, aunque solo tenga una carta
+            HorizontalLayoutGroup layout = deluxeCardContainer.GetComponent<HorizontalLayoutGroup>();
+            if (layout == null)
+            {
+                layout = deluxeCardContainer.gameObject.AddComponent<HorizontalLayoutGroup>();
+            }
+
+            layout.childAlignment = TextAnchor.MiddleCenter;
+            layout.childForceExpandWidth = false;
+            layout.childForceExpandHeight = false;
         }
     }
 
