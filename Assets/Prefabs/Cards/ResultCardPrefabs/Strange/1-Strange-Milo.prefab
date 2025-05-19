@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4286841370390198236}
   - component: {fileID: 5497955447129450876}
   - component: {fileID: -5740928524806341751}
+  - component: {fileID: 5457320075975440595}
   m_Layer: 0
   m_Name: 1-Strange-Milo
   m_TagString: Untagged
@@ -106,3 +107,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!64 &5457320075975440595
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874208454561465789}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2434297082078466880, guid: 1df975e2cbffec84495e1ce0c81cd01e, type: 3}

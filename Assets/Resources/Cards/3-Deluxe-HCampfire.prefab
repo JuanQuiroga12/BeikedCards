@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5081816239294167700}
   - component: {fileID: 1900710095288231901}
   - component: {fileID: 5266322952980360224}
+  - component: {fileID: -2846307312456651778}
   m_Layer: 0
   m_Name: 3-Deluxe-HCampfire
   m_TagString: Untagged
@@ -106,3 +107,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!64 &-2846307312456651778
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8284045266265923273}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -539375222566550318, guid: 76144881e4c7f1245b04fbc65879b86a, type: 3}

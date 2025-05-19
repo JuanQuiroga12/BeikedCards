@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7700243793816787060}
   - component: {fileID: 2097491050584753249}
   - component: {fileID: 8094998799862086678}
+  - component: {fileID: 1866702981455617660}
   m_Layer: 0
   m_Name: 3-Strange-Klim
   m_TagString: Untagged
@@ -106,3 +107,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!64 &1866702981455617660
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 874208454561465789}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -2220543883239357509, guid: dd9c3c4cc976d434995438e78fa04322, type: 3}

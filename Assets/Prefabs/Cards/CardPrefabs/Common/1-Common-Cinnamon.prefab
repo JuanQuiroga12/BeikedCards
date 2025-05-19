@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 3672178200155581131}
   - component: {fileID: 9215243280666205273}
   - component: {fileID: 875527931399465465}
+  - component: {fileID: -2515513406320651668}
   m_Layer: 0
   m_Name: 1-Common-Cinnamon
   m_TagString: Untagged
@@ -106,3 +107,25 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!64 &-2515513406320651668
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4654848794465905052}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -6297219565033385234, guid: 124c7d822e67a594b81663b179be42a3, type: 3}
