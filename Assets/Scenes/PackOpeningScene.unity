@@ -805,15 +805,15 @@ MonoBehaviour:
   resultCardsContainer: {fileID: 1085776072}
   continueButton: {fileID: 1718763588}
   commonCardPrefabs:
-  - {fileID: 4654848794465905052, guid: ca34261f981899441b7bbb2e71589c91, type: 3}
-  - {fileID: 8517391896581355732, guid: 7096f8bc7bf4e1b4aaf802e622f2daf8, type: 3}
-  - {fileID: 8517391896581355732, guid: 808ef62c600041347a737aaa16d3794d, type: 3}
-  - {fileID: 1524762797264600315, guid: 43cbc89b58852d143bc515195b0f34d5, type: 3}
-  - {fileID: 8517391896581355732, guid: ed8f7654431e7744aabe6833d21636eb, type: 3}
-  - {fileID: 8517391896581355732, guid: db5001ad26230f943abc8448c17b4879, type: 3}
-  - {fileID: 8517391896581355732, guid: a1da4ccd6431b9b4d81df6d7a26b1e1f, type: 3}
-  - {fileID: 8517391896581355732, guid: 09ff472c8d83ba449b6f72b4f7b31fa6, type: 3}
-  - {fileID: 8517391896581355732, guid: e1590bb5e6526d14999eabf1dffda2a4, type: 3}
+  - {fileID: 4654848794465905052, guid: 3018368881cc77d498802a51f80e2ba9, type: 3}
+  - {fileID: 8517391896581355732, guid: b6cd5c954a4cf6640b6e5ed6fb85d1b6, type: 3}
+  - {fileID: 8517391896581355732, guid: 3f1ed05dce44bb44d8929d98238088af, type: 3}
+  - {fileID: 8517391896581355732, guid: ad3eef052c5b6b840bdcf4e84beae99f, type: 3}
+  - {fileID: 8517391896581355732, guid: 881bbfa39c6bf564e86542fca6943dc5, type: 3}
+  - {fileID: 8517391896581355732, guid: 1a3acd0544433c64a9443325b7ca8e00, type: 3}
+  - {fileID: 1524762797264600315, guid: d36513ec35729e84eaace1313cbd79aa, type: 3}
+  - {fileID: 8517391896581355732, guid: e32d6b07e5707da4f920b65e315a90ab, type: 3}
+  - {fileID: 8517391896581355732, guid: 9d7d7834b96878c4c937db1436c16197, type: 3}
   strangeCardPrefabs:
   - {fileID: 874208454561465789, guid: 2236564d1acf92542849f53df4e3a1e3, type: 3}
   - {fileID: 874208454561465789, guid: e77850e408736b34fb3c133a74e67a35, type: 3}
@@ -822,9 +822,9 @@ MonoBehaviour:
   - {fileID: 874208454561465789, guid: f364b5882c9eab34cb2dc48bc972ffee, type: 3}
   - {fileID: 874208454561465789, guid: c3b3096952b2b6745b3c1fe51ae7f1f4, type: 3}
   deluxeCardPrefabs:
-  - {fileID: 8284045266265923273, guid: 8e6b8622536c9874e8ae580d1c5d6966, type: 3}
-  - {fileID: 8284045266265923273, guid: 014f4fb82c9dac34482394a259459e49, type: 3}
-  - {fileID: 8284045266265923273, guid: a65a0190518adea448b18f8f5174a6e3, type: 3}
+  - {fileID: 8284045266265923273, guid: 94d2093fbc3be5649bf67da3621d5f89, type: 3}
+  - {fileID: 8284045266265923273, guid: a4526f32928fecf4cae9fd3180f6b8d4, type: 3}
+  - {fileID: 8284045266265923273, guid: 0b6c8ed1c0465be45b0bc7d9aeb72979, type: 3}
   commonResultCardPrefabs:
   - {fileID: 4654848794465905052, guid: c89474157512344479145217f7ffade8, type: 3}
   - {fileID: 8517391896581355732, guid: 36ad9258ecb966f4daabd1a5c8effd6d, type: 3}
@@ -1424,7 +1424,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1454264509}
   - component: {fileID: 1454264508}
-  - component: {fileID: 1454264510}
+  - component: {fileID: 1454264507}
   m_Layer: 0
   m_Name: EventSystem
   m_TagString: Untagged
@@ -1432,6 +1432,26 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!114 &1454264507
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1454264506}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SendPointerHoverToParent: 1
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
 --- !u!114 &1454264508
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1462,48 +1482,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1454264510
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1454264506}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
-  m_MoveRepeatDelay: 0.5
-  m_MoveRepeatRate: 0.1
-  m_XRTrackingOrigin: {fileID: 0}
-  m_ActionsAsset: {fileID: -944628639613478452, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_PointAction: {fileID: -1654692200621890270, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_MoveAction: {fileID: -8784545083839296357, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_SubmitAction: {fileID: 392368643174621059, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_CancelAction: {fileID: 7727032971491509709, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_LeftClickAction: {fileID: 3001919216989983466, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_MiddleClickAction: {fileID: -2185481485913320682, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_RightClickAction: {fileID: -4090225696740746782, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_ScrollWheelAction: {fileID: 6240969308177333660, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_TrackedDevicePositionAction: {fileID: 6564999863303420839, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_TrackedDeviceOrientationAction: {fileID: 7970375526676320489, guid: ca9f5fa95ffab41fb9a615ab714db018,
-    type: 3}
-  m_DeselectOnBackgroundClick: 1
-  m_PointerBehavior: 0
-  m_CursorLockBehavior: 0
-  m_ScrollDeltaPerTick: 6
 --- !u!1 &1497328307
 GameObject:
   m_ObjectHideFlags: 0

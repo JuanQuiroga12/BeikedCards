@@ -33,14 +33,14 @@ public class CollectionManager : MonoBehaviour
         // Historia 2
         { "2-1-Common", "2-Common-ChocolateChips" },
         { "2-2-Common", "2-Common-KeyLimePie" },
-        { "2-3-Common", "2-Common-CaramelPecans" },
+        { "2-3-Common", "2-Common-Cinnamon" },
         { "2-1-Strange", "2-Strange-Birthday" },
         { "2-2-Strange", "2-Strange-Klim" },
         { "2-1-Deluxe", "2-Deluxe-Nutella" },
     
         // Historia 3
         { "3-1-Common", "3-Common-ChocolateChips" },
-        { "3-2-Common", "3-Common-Cinnamon" },
+        { "3-2-Common", "3-Common-CaramelPecans" },
         { "3-3-Common", "3-Common-KeyLimePie" },
         { "3-1-Strange", "3-Strange-LaDeMilo" },
         { "3-2-Strange", "3-Strange-MoltenLava" },
