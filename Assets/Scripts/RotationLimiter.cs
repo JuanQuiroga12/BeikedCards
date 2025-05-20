@@ -1,6 +1,4 @@
 using UnityEngine;
-using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Controls;
 
 public class RotationLimiter : MonoBehaviour
 {
@@ -22,7 +20,7 @@ public class RotationLimiter : MonoBehaviour
 
     // Internal tracking variables
     private bool isDragging = false;
-    private Vector2 previousMousePosition;
+    private Vector3 previousMousePosition;
     private float dragTime = 0f;
     private Vector2 dragVelocity;
     private Vector3 targetRotation;
@@ -67,34 +65,19 @@ public class RotationLimiter : MonoBehaviour
 
     private void HandleInput()
     {
-        // Get current mouse state
-        Mouse mouse = Mouse.current;
-        if (mouse == null) return;
-
-        // Get current touch state (for mobile)
-        Touchscreen touchscreen = Touchscreen.current;
-        bool isTouching = touchscreen != null && touchscreen.primaryTouch.press.isPressed;
-
-        // Current pointer position (mouse or touch)
-        Vector2 pointerPosition = mouse.position.ReadValue();
-        if (isTouching && touchscreen != null)
-        {
-            pointerPosition = touchscreen.primaryTouch.position.ReadValue();
-        }
-
         // Start dragging
-        if (mouse.leftButton.wasPressedThisFrame || (touchscreen != null && touchscreen.primaryTouch.press.wasPressedThisFrame))
+        if (Input.GetMouseButtonDown(0))
         {
             isDragging = true;
-            previousMousePosition = pointerPosition;
+            previousMousePosition = Input.mousePosition;
             dragTime = Time.time;
             dragVelocity = Vector2.zero;
         }
         // End dragging
-        else if (mouse.leftButton.wasReleasedThisFrame || (isTouching && touchscreen != null && touchscreen.primaryTouch.press.wasReleasedThisFrame))
+        else if (Input.GetMouseButtonUp(0))
         {
             // Calculate final velocity
-            Vector2 currentVelocity = CalculateDragVelocity(pointerPosition);
+            Vector2 currentVelocity = CalculateDragVelocity(Input.mousePosition);
 
             // Check for quick flip
             if (Mathf.Abs(currentVelocity.x) > quickFlipThreshold)
@@ -108,11 +91,13 @@ public class RotationLimiter : MonoBehaviour
         // Process dragging
         if (isDragging)
         {
+            Vector3 currentMousePosition = Input.mousePosition;
+
             // Calculate relative position to screen center
             Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
             Vector2 mouseOffset = new Vector2(
-                (screenCenter.x - pointerPosition.x) / screenCenter.x,
-                (screenCenter.y - pointerPosition.y) / screenCenter.y
+                (screenCenter.x - currentMousePosition.x) / screenCenter.x,
+                (screenCenter.y - currentMousePosition.y) / screenCenter.y
             );
 
             // Calculate base rotation
@@ -126,8 +111,8 @@ public class RotationLimiter : MonoBehaviour
             );
 
             // Update drag velocity
-            dragVelocity = CalculateDragVelocity(pointerPosition);
-            previousMousePosition = pointerPosition;
+            dragVelocity = CalculateDragVelocity(currentMousePosition);
+            previousMousePosition = currentMousePosition;
             dragTime = Time.time;
         }
         else if (returnToDefaultOnRelease)
@@ -152,7 +137,7 @@ public class RotationLimiter : MonoBehaviour
         );
     }
 
-    private Vector2 CalculateDragVelocity(Vector2 currentPosition)
+    private Vector2 CalculateDragVelocity(Vector3 currentPosition)
     {
         // Calculate time delta (avoid division by zero)
         float deltaTime = Mathf.Max(Time.time - dragTime, 0.001f);

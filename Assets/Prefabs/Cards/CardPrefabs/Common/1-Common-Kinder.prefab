@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2449698826353404389}
   - component: {fileID: 8934144850696905291}
   - component: {fileID: 8935004294948708249}
-  - component: {fileID: -5545744820204686192}
+  - component: {fileID: 1790487191809883938}
   m_Layer: 0
   m_Name: 1-Common-Kinder
   m_TagString: Untagged
@@ -107,7 +107,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!64 &-5545744820204686192
+--- !u!64 &1790487191809883938
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
