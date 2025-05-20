@@ -13,7 +13,6 @@ public class CardDetailView : MonoBehaviour
     [SerializeField] private TextMeshProUGUI cardNameText;
     [SerializeField] private TextMeshProUGUI cardTypeText;
     [SerializeField] private TextMeshProUGUI cardDescriptionText;
-    [SerializeField] private TextMeshProUGUI storyTitleText;
     [SerializeField] private GameObject rotationInstructions;
 
     [Header("Card Models")]
@@ -28,7 +27,6 @@ public class CardDetailView : MonoBehaviour
     private GameObject currentCardModel;
     private Card displayedCard;
     private Coroutine instructionsCoroutine;
-    private string currentPrefabName;
 
     private void Start()
     {
@@ -45,36 +43,10 @@ public class CardDetailView : MonoBehaviour
             rotationLimiter.SetTargetTransform(cardModelParent);
         }
 
-        // Setup UI elements for better presentation
-        SetupCardInfoPanel();
-
         // Show instructions temporarily
         if (rotationInstructions != null)
         {
             StartCoroutine(ShowInstructionsTemporarily());
-        }
-    }
-
-    private void SetupCardInfoPanel()
-    {
-        // Make sure the description text has word wrapping
-        if (cardDescriptionText != null)
-        {
-            cardDescriptionText.enableWordWrapping = true;
-            cardDescriptionText.overflowMode = TextOverflowModes.Ellipsis;
-            cardDescriptionText.margin = new Vector4(10, 10, 10, 10); // Add some padding
-        }
-
-        // Ensure card name is prominent
-        if (cardNameText != null)
-        {
-            cardNameText.fontStyle = FontStyles.Bold;
-        }
-
-        // Make card type stand out
-        if (cardTypeText != null)
-        {
-            cardTypeText.fontStyle = FontStyles.Italic;
         }
     }
 
@@ -110,7 +82,6 @@ public class CardDetailView : MonoBehaviour
         // Obtener ID y nombre del prefab de la carta seleccionada
         string cardId = PlayerPrefs.GetString("SelectedCardId", "");
         string prefabName = PlayerPrefs.GetString("SelectedCardPrefab", "");
-        currentPrefabName = prefabName;
 
         if (string.IsNullOrEmpty(cardId) || string.IsNullOrEmpty(prefabName))
         {
@@ -128,19 +99,8 @@ public class CardDetailView : MonoBehaviour
             return;
         }
 
-        // Get the real card name and description from the database
-        string cardRealName = CardDatabase.GetCardName(prefabName);
-        string cardRealDescription = CardDatabase.GetCardDescription(prefabName);
-        string storyName = CardDatabase.GetStoryName(displayedCard.storyId);
-
         // Mostrar información de la carta
-        cardNameText.text = cardRealName;
-
-        // Set story title if available
-        if (storyTitleText != null)
-        {
-            storyTitleText.text = storyName;
-        }
+        cardNameText.text = displayedCard.name;
 
         // Configurar texto del tipo de carta
         switch (displayedCard.type)
@@ -159,8 +119,8 @@ public class CardDetailView : MonoBehaviour
                 break;
         }
 
-        // Use the real description instead of the generic one
-        cardDescriptionText.text = cardRealDescription;
+        cardDescriptionText.text = !string.IsNullOrEmpty(displayedCard.description) ?
+            displayedCard.description : "Una carta de la colección Beiked";
 
         // Cargar el prefab específico
         InstantiateCardPrefab(prefabName);
@@ -420,18 +380,6 @@ public class CardDetailView : MonoBehaviour
 
             renderer.material = mat;
         }
-
-        // Add the real card name to the placeholder
-        GameObject textObj = new GameObject("CardText");
-        textObj.transform.SetParent(placeholder.transform);
-        textObj.transform.localPosition = new Vector3(0, 0.1f, 0);
-        textObj.transform.localRotation = Quaternion.Euler(90, 0, 0);
-        TextMesh textMesh = textObj.AddComponent<TextMesh>();
-        textMesh.text = CardDatabase.GetCardName(currentPrefabName);
-        textMesh.characterSize = 0.1f;
-        textMesh.alignment = TextAlignment.Center;
-        textMesh.anchor = TextAnchor.MiddleCenter;
-        textMesh.color = Color.black;
 
         // Guardar referencia
         currentCardModel = placeholder;
