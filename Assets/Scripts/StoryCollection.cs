@@ -81,6 +81,9 @@ public class StoryCollection : MonoBehaviour
 
         ConfigureCardContainers();
 
+        // AÑADIDO: Registro detallado para depuración
+        Debug.Log($"StoryCollection.Initialize: Historia {id} - {title}");
+
         // Cargar todas las cartas de esta colección
         LoadStoryCards(cardToPrefabMap);
 
@@ -98,12 +101,16 @@ public class StoryCollection : MonoBehaviour
         DebugCardData();
     }
 
+    // Mejorar el método LoadStoryCards con mejor logging
     private void LoadStoryCards(Dictionary<string, string> cardToPrefabMap)
     {
         try
         {
             // Obtener todas las cartas de esta historia
             List<Card> storyCards = DataManager.GetCardsByStory(storyId);
+
+            Debug.Log($"LoadStoryCards: Historia {storyId} - {storyTitleText.text}, Cartas: {(storyCards != null ? storyCards.Count : 0)}");
+
             hasAnyCards = storyCards != null && storyCards.Count > 0;
 
             // Para limpiar slots anteriores
@@ -121,7 +128,7 @@ public class StoryCollection : MonoBehaviour
                 {
                     if (cardSlotPrefab == null || commonCardsContainer == null)
                     {
-                        Debug.LogError("CardSlotPrefab o commonCardsContainer son nulos");
+                        Debug.LogError($"LoadStoryCards [{storyId}]: CardSlotPrefab o commonCardsContainer son nulos");
                         continue;
                     }
 
@@ -130,7 +137,7 @@ public class StoryCollection : MonoBehaviour
 
                     if (slot == null)
                     {
-                        Debug.LogError("El prefab CardSlot no tiene componente CardSlot");
+                        Debug.LogError($"LoadStoryCards [{storyId}]: El prefab CardSlot no tiene componente CardSlot");
                         continue;
                     }
 
@@ -147,6 +154,8 @@ public class StoryCollection : MonoBehaviour
 
                     if (card != null)
                     {
+                        Debug.Log($"LoadStoryCards [{storyId}]: Encontrada carta Common {i}, ID: {card.id}");
+
                         // Verificar si la clave existe antes de usarla
                         if (cardToPrefabMap.TryGetValue(cardKey, out string prefabName))
                         {
@@ -154,18 +163,19 @@ public class StoryCollection : MonoBehaviour
                         }
                         else
                         {
-                            Debug.LogWarning($"Clave no encontrada en el mapeo: {cardKey}");
+                            Debug.LogWarning($"LoadStoryCards [{storyId}]: Clave no encontrada en el mapeo: {cardKey}");
                             slot.SetEmpty();
                         }
                     }
                     else
                     {
+                        Debug.Log($"LoadStoryCards [{storyId}]: No se encontró carta Common {i}");
                         slot.SetEmpty();
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"Error al procesar carta Common {i}: {e.Message}");
+                    Debug.LogError($"LoadStoryCards [{storyId}]: Error al procesar carta Common {i}: {e.Message}");
                 }
             }
 
@@ -176,7 +186,7 @@ public class StoryCollection : MonoBehaviour
                 {
                     if (cardSlotPrefab == null || strangeCardsContainer == null)
                     {
-                        Debug.LogError("CardSlotPrefab o strangeCardsContainer son nulos");
+                        Debug.LogError($"LoadStoryCards [{storyId}]: CardSlotPrefab o strangeCardsContainer son nulos");
                         continue;
                     }
 
@@ -192,6 +202,8 @@ public class StoryCollection : MonoBehaviour
 
                     if (card != null)
                     {
+                        Debug.Log($"LoadStoryCards [{storyId}]: Encontrada carta Strange {i}, ID: {card.id}");
+
                         // Verificar si la clave existe antes de usarla
                         if (cardToPrefabMap.TryGetValue(cardKey, out string prefabName))
                         {
@@ -199,18 +211,19 @@ public class StoryCollection : MonoBehaviour
                         }
                         else
                         {
-                            Debug.LogWarning($"Clave no encontrada en el mapeo: {cardKey}");
+                            Debug.LogWarning($"LoadStoryCards [{storyId}]: Clave no encontrada en el mapeo: {cardKey}");
                             slot.SetEmpty();
                         }
                     }
                     else
                     {
+                        Debug.Log($"LoadStoryCards [{storyId}]: No se encontró carta Strange {i}");
                         slot.SetEmpty();
                     }
                 }
                 catch (System.Exception e)
                 {
-                    Debug.LogError($"Error al procesar carta Strange {i}: {e.Message}");
+                    Debug.LogError($"LoadStoryCards [{storyId}]: Error al procesar carta Strange {i}: {e.Message}");
                 }
             }
 
@@ -219,7 +232,7 @@ public class StoryCollection : MonoBehaviour
             {
                 if (cardSlotPrefab == null || deluxeCardContainer == null)
                 {
-                    Debug.LogError("CardSlotPrefab o deluxeCardContainer son nulos");
+                    Debug.LogError($"LoadStoryCards [{storyId}]: CardSlotPrefab o deluxeCardContainer son nulos");
                     return;
                 }
 
@@ -235,6 +248,8 @@ public class StoryCollection : MonoBehaviour
 
                 if (deluxeCard != null)
                 {
+                    Debug.Log($"LoadStoryCards [{storyId}]: Encontrada carta Deluxe, ID: {deluxeCard.id}");
+
                     // Verificar si la clave existe antes de usarla
                     if (cardToPrefabMap.TryGetValue(deluxeKey, out string prefabName))
                     {
@@ -242,23 +257,24 @@ public class StoryCollection : MonoBehaviour
                     }
                     else
                     {
-                        Debug.LogWarning($"Clave no encontrada en el mapeo: {deluxeKey}");
+                        Debug.LogWarning($"LoadStoryCards [{storyId}]: Clave no encontrada en el mapeo: {deluxeKey}");
                         deluxeSlot.SetEmpty();
                     }
                 }
                 else
                 {
+                    Debug.Log($"LoadStoryCards [{storyId}]: No se encontró carta Deluxe");
                     deluxeSlot.SetEmpty();
                 }
             }
             catch (System.Exception e)
             {
-                Debug.LogError($"Error al procesar carta Deluxe: {e.Message}");
+                Debug.LogError($"LoadStoryCards [{storyId}]: Error al procesar carta Deluxe: {e.Message}");
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error al cargar cartas para la historia {storyId}: {e.Message}");
+            Debug.LogError($"LoadStoryCards: Error general al cargar cartas para la historia {storyId}: {e.Message}");
         }
     }
 

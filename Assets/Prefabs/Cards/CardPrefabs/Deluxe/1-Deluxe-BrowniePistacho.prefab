@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3035160808516467935}
   - component: {fileID: 6719540459523786239}
   - component: {fileID: 2474984631158360338}
-  - component: {fileID: -1688495133367768709}
+  - component: {fileID: 7641917413047319}
   m_Layer: 0
   m_Name: 1-Deluxe-BrowniePistacho
   m_TagString: Untagged
@@ -107,7 +107,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!64 &-1688495133367768709
+--- !u!64 &7641917413047319
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
