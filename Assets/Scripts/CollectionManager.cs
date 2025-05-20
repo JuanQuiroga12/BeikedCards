@@ -65,39 +65,59 @@ public class CollectionManager : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("CollectionManager: Iniciando");
+        Debug.Log("CollectionManager: Iniciando carga de datos");
 
         // Inicializar DataManager
         DataManager.Initialize();
 
-        List<Card> transferredCards = CardTransferSystem.RetrieveCards();
-        if (transferredCards.Count > 0)
-        {
-            Debug.Log($"Recibidas {transferredCards.Count} cartas desde CardTransferSystem");
-            DataManager.AddCardsFromPack(transferredCards);
-            CardTransferSystem.ClearCards();
-        }
-
-        // CRÍTICO: En Android, cargar directamente desde nuestro sistema específico
+        // NUEVO: Intento de diagnóstico y recuperación específicamente para Android
         if (Application.platform == RuntimePlatform.Android)
         {
-            Debug.Log("CollectionManager: Plataforma Android detectada, cargando datos específicos");
+            if (DataManager.GetAllCards().Count == 0)
+            {
+                Debug.Log("CollectionManager: No se encontraron cartas, intentando recuperación...");
 
-            // Forzar carga de datos desde nuestro sistema Android
-            AndroidCardDataManager.ForceLoadToDataManager();
+                // Intento 1: Cargar desde el respaldo estándar
+                bool backupLoaded = DataManager.LoadBackupIfNeeded();
 
-            // Verificar estado
-            int count = DataManager.GetAllCards().Count;
-            Debug.Log($"CollectionManager: Estado después de carga forzada: {count} cartas");
+                // Intento 2: Diagnóstico y recuperación personalizada
+                if (!backupLoaded || DataManager.GetAllCards().Count == 0)
+                {
+                    Debug.Log("CollectionManager: Intento 1 falló, ejecutando diagnóstico avanzado...");
+                    DataManager.DiagnoseAndRecover();
+                }
+
+                // Intento 3: Usar AndroidDataPersistence directamente
+                if (DataManager.GetAllCards().Count == 0)
+                {
+                    Debug.Log("CollectionManager: Intento 2 falló, intentando carga directa desde AndroidDataPersistence...");
+                    List<Card> cards = AndroidDataPersistence.GetCards();
+
+                    if (cards != null && cards.Count > 0)
+                    {
+                        Debug.Log($"CollectionManager: Recuperadas {cards.Count} cartas de AndroidDataPersistence");
+
+                        // Forzar la reintegración de estos datos
+                        DataManager.AddCardsFromPack(cards);
+                    }
+                }
+            }
         }
         else
         {
-            // En editor, intentar el respaldo si es necesario
+            // Comportamiento estándar para Editor
             if (DataManager.GetAllCards().Count == 0)
             {
-                DataManager.LoadBackupIfNeeded();
+                Debug.Log("CollectionManager: No se encontraron cartas, intentando cargar respaldo...");
+                bool backupLoaded = DataManager.LoadBackupIfNeeded();
+                if (backupLoaded)
+                {
+                    Debug.Log("CollectionManager: Datos cargados desde respaldo en PlayerPrefs");
+                }
             }
         }
+
+        Debug.Log($"CollectionManager: Carga completada. Total de cartas: {DataManager.GetAllCards().Count}");
 
         // Configurar botón de retroceso
         backButton.onClick.AddListener(() => SceneManager.LoadScene("Scenes/MainScene"));
