@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3672178200155581131}
   - component: {fileID: 9215243280666205273}
   - component: {fileID: 875527931399465465}
-  - component: {fileID: -975100266518045520}
+  - component: {fileID: -2515513406320651668}
   m_Layer: 0
   m_Name: 1-Common-Cinnamon
   m_TagString: Untagged
@@ -107,7 +107,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!64 &-975100266518045520
+--- !u!64 &-2515513406320651668
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
