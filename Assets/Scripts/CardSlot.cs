@@ -20,10 +20,6 @@ public class CardSlot : MonoBehaviour
         this.card = card;
         this.prefabName = prefabName;
 
-        // Get the real card name from the database
-        string realCardName = CardDatabase.GetCardName(prefabName);
-
-
         // Configurar apariencia según tipo
         switch (card.type)
         {

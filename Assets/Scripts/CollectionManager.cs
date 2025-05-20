@@ -33,14 +33,14 @@ public class CollectionManager : MonoBehaviour
         // Historia 2
         { "2-1-Common", "2-Common-ChocolateChips" },
         { "2-2-Common", "2-Common-KeyLimePie" },
-        { "2-3-Common", "2-Common-CaramelPecans" },
+        { "2-3-Common", "2-Common-Cinnamon" },
         { "2-1-Strange", "2-Strange-Birthday" },
         { "2-2-Strange", "2-Strange-Klim" },
         { "2-1-Deluxe", "2-Deluxe-Nutella" },
     
         // Historia 3
         { "3-1-Common", "3-Common-ChocolateChips" },
-        { "3-2-Common", "3-Common-Cinnamon" },
+        { "3-2-Common", "3-Common-CaramelPecans" },
         { "3-3-Common", "3-Common-KeyLimePie" },
         { "3-1-Strange", "3-Strange-LaDeMilo" },
         { "3-2-Strange", "3-Strange-MoltenLava" },
@@ -65,6 +65,7 @@ public class CollectionManager : MonoBehaviour
 
     private void Start()
     {
+<<<<<<< HEAD
         Debug.Log("CollectionManager: Iniciando");
 
         // Inicializar DataManager
@@ -98,14 +99,26 @@ public class CollectionManager : MonoBehaviour
                 DataManager.LoadBackupIfNeeded();
             }
         }
+=======
+        // Inicializar DataManager
+        DataManager.Initialize();
+
+        // Verificar recursos de cartas
+        VerifyCardResources();
+>>>>>>> parent of 0b2d487 (Intento de arreglar en android)
 
         // Configurar botón de retroceso
-        backButton.onClick.AddListener(() => SceneManager.LoadScene("Scenes/MainScene"));
+        if (backButton != null)
+            backButton.onClick.AddListener(() => SceneManager.LoadScene("MainScene"));
+        else
+            Debug.LogWarning("BackButton no asignado, no se puede configurar la navegación de retorno");
 
-        // Cargar colecciones
+        // Configurar layout del contenedor principal
+        ConfigureCollectionLayout();
+
+        // Cargar todas las colecciones
         LoadCollections();
     }
-
 
     // Agregar este método a CollectionManager.cs
     private void CreateTestCards()
@@ -238,7 +251,6 @@ public class CollectionManager : MonoBehaviour
     }
 
 
-    // Método LoadCollections mejorado para mostrar mejor información de depuración
     private void LoadCollections()
     {
         // Verificar componentes críticos
@@ -247,8 +259,7 @@ public class CollectionManager : MonoBehaviour
             Debug.LogError("No se pueden cargar colecciones: collectionContent o storyCollectionPrefab son nulos");
             return;
         }
-
-        Debug.Log($"CollectionManager.LoadCollections: Usando prefab: {storyCollectionPrefab.name}");
+        Debug.Log($"Usando prefab: {storyCollectionPrefab.name} de tipo: {storyCollectionPrefab.GetType()}");
 
         // Limpiar contenido actual
         foreach (Transform child in collectionContent)
@@ -256,44 +267,23 @@ public class CollectionManager : MonoBehaviour
             Destroy(child.gameObject);
         }
 
-        // Verificar los datos de forma explícita
-        List<Card> allCards = DataManager.GetAllCards();
-        Debug.Log($"LoadCollections: Total de cartas en colección: {allCards.Count}");
-
-        if (allCards.Count > 0)
-        {
-            // Listar algunas cartas para depuración
-            for (int i = 0; i < Mathf.Min(allCards.Count, 5); i++)
-            {
-                Card card = allCards[i];
-                Debug.Log($"Carta {i + 1}: ID={card.id}, Nombre={card.name}, StoryID={card.storyId}, Tipo={card.type}");
-            }
-        }
-
         bool anyCardsFound = false;
 
-        // Cargar cada historia/colección
+        // Cargar cada historia/colecciуn
         foreach (var story in storyNames)
         {
-            Debug.Log($"LoadCollections: Procesando historia {story.Key} - {story.Value}");
-
             GameObject storyObj = Instantiate(storyCollectionPrefab, collectionContent);
             StoryCollection storyCollection = storyObj.GetComponent<StoryCollection>();
 
             if (storyCollection != null)
             {
-                // Configurar la colección
+                // Configurar la colecciуn
                 storyCollection.Initialize(story.Key, story.Value, cardToPrefabMap);
 
-                // Verificar si hay cartas en esta colección
+                // Verificar si hay cartas en esta colecciуn
                 if (storyCollection.HasAnyCards())
                 {
                     anyCardsFound = true;
-                    Debug.Log($"Colección {story.Key} tiene cartas");
-                }
-                else
-                {
-                    Debug.Log($"Colección {story.Key} está vacía");
                 }
             }
             else
@@ -302,29 +292,14 @@ public class CollectionManager : MonoBehaviour
             }
         }
 
-        // Mostrar u ocultar mensaje de colección vacía
+        // Mostrar u ocultar mensaje de colecciуn vacнa
         if (emptyCollectionMessage != null)
-        {
             emptyCollectionMessage.SetActive(!anyCardsFound);
-            Debug.Log($"Mensaje de colección vacía: {!anyCardsFound}");
-        }
     }
-
 
     // Mйtodo para actualizar todas las colecciones (llamado desde otras escenas)
     public void RefreshCollections()
     {
         LoadCollections();
-    }
-
-    // AÑADIR ESTE MÉTODO AL FINAL DEL COLLECTIONMANAGER
-    private void OnApplicationPause(bool pause)
-    {
-        if (!pause)
-        {
-            // Refrescar al volver
-            Debug.Log("CollectionManager: Aplicación reanudada, refrescando colecciones");
-            LoadCollections();
-        }
     }
 }
