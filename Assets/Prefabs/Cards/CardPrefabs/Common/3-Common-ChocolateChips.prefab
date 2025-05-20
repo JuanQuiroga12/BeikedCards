@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 2051393357378891533}
   - component: {fileID: 2037441343737850844}
   - component: {fileID: 5281310805130930396}
-  - component: {fileID: -862624531235697879}
+  - component: {fileID: 3841471155226674530}
   m_Layer: 0
   m_Name: 3-Common-ChocolateChips
   m_TagString: Untagged
@@ -107,7 +107,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 400, y: 400, z: 1.0000002}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!64 &-862624531235697879
+--- !u!64 &3841471155226674530
 MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
