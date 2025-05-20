@@ -190,6 +190,28 @@ public static class DataManager
         }
     }
 
+    // Añadir este método a la clase DataManager
+    public static void RefreshCardCollection(List<Card> newCollection)
+    {
+        if (userData == null)
+        {
+            Initialize();
+        }
+
+        if (newCollection != null && newCollection.Count > 0)
+        {
+            userData.collectedCards = new List<Card>(newCollection);
+            Debug.Log($"DataManager: Colección actualizada con {newCollection.Count} cartas");
+
+            // Guardar inmediatamente para persistir los cambios
+            SaveData();
+        }
+        else
+        {
+            Debug.LogWarning("DataManager: Intento de actualizar colección con lista vacía o nula");
+        }
+    }
+
     // Métodos para acceder y modificar los datos
     public static bool IsQRCodeUsed(string qrCode)
     {

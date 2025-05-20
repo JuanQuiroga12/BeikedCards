@@ -568,165 +568,149 @@ public class PackOpeningManager : MonoBehaviour
         {
             List<Card> newCards = new List<Card>();
 
-            // Verificar que DataManager esté inicializado
-            if (DataManager.GetAllCards() == null)
-            {
-                Debug.LogWarning("DataManager no inicializado. Inicializando...");
-                DataManager.Initialize();
-            }
-
-            Debug.Log("Comenzando a guardar cartas obtenidas...");
-
             // Convertir CardInfo a Card para guardar
             foreach (CardInfo cardInfo in cardsToReveal)
             {
                 if (cardInfo == null || cardInfo.cardPrefab == null)
                 {
-                    Debug.LogWarning("CardInfo nula o sin prefab. Omitiendo...");
                     continue;
                 }
 
                 Card card = new Card();
-                card.id = System.Guid.NewGuid().ToString(); // ID único
-
-                // Determinar nombre y tipo basado en prefab
+                card.id = System.Guid.NewGuid().ToString();
                 string prefabName = cardInfo.cardPrefab.name;
                 card.name = prefabName;
-
-                // Determinar imagePath
                 card.imagePath = "Cards/" + prefabName;
 
                 // Determinar tipo
                 switch (cardInfo.rarity)
                 {
-                    case CardRarity.Common:
-                        card.type = CardType.CommonBeiked;
-                        break;
-                    case CardRarity.Strange:
-                        card.type = CardType.StrangeBeiked;
-                        break;
-                    case CardRarity.Deluxe:
-                        card.type = CardType.DeluxeBeiked;
-                        break;
+                    case CardRarity.Common: card.type = CardType.CommonBeiked; break;
+                    case CardRarity.Strange: card.type = CardType.StrangeBeiked; break;
+                    case CardRarity.Deluxe: card.type = CardType.DeluxeBeiked; break;
                 }
 
-                // Determinar storyId y storyPart basados en el nombre
+                // Determinar storyId y storyPart
                 string[] parts = prefabName.Split('-');
                 if (parts.Length > 0)
                 {
                     card.storyId = "story_" + parts[0];
 
-                    // Intenta determinar storyPart basado en el nombre
+                    // Configurar storyPart según el tipo de carta...
                     if (parts.Length > 1)
                     {
-                        if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Lógica para determinar qué carta común es
-                            card.storyPart = 1; // Valor por defecto
+                        card.storyId = "story_" + parts[0];
 
-                            for (int i = 2; i < parts.Length; i++)
+                        // Intenta determinar storyPart basado en el nombre
+                        if (parts.Length > 1)
+                        {
+                            if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
                             {
-                                if (parts[i].Contains("Cinnamon"))
+                                // Lógica para determinar qué carta común es
+                                card.storyPart = 1; // Valor por defecto
+
+                                for (int i = 2; i < parts.Length; i++)
                                 {
-                                    card.storyPart = 1;
-                                    break;
-                                }
-                                else if (parts[i].Contains("Klim") || parts[i].Contains("KeyLime"))
-                                {
-                                    card.storyPart = 2;
-                                    break;
-                                }
-                                else if (parts[i].Contains("Chocolate"))
-                                {
-                                    card.storyPart = 3;
-                                    break;
+                                    if (parts[i].Contains("Cinnamon"))
+                                    {
+                                        card.storyPart = 1;
+                                        break;
+                                    }
+                                    else if (parts[i].Contains("Klim") || parts[i].Contains("KeyLime"))
+                                    {
+                                        card.storyPart = 2;
+                                        break;
+                                    }
+                                    else if (parts[i].Contains("Chocolate"))
+                                    {
+                                        card.storyPart = 3;
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Lógica para determinar qué carta Strange es
-                            card.storyPart = 1; // Valor por defecto
-
-                            for (int i = 2; i < parts.Length; i++)
+                            else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
                             {
-                                if (parts[i].Contains("Birthday") || parts[i].Contains("LaDeMilo"))
+                                // Lógica para determinar qué carta Strange es
+                                card.storyPart = 1; // Valor por defecto
+
+                                for (int i = 2; i < parts.Length; i++)
                                 {
-                                    card.storyPart = 1;
-                                    break;
+                                    if (parts[i].Contains("Birthday") || parts[i].Contains("LaDeMilo"))
+                                    {
+                                        card.storyPart = 1;
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        card.storyPart = 2;
+                                        break;
+                                    }
                                 }
-                                else
-                                {
-                                    card.storyPart = 2;
-                                    break;
-                                }
+                            }
+                            else
+                            {
+                                card.storyPart = 1; // Para Deluxe
                             }
                         }
                         else
                         {
-                            card.storyPart = 1; // Para Deluxe
+                            card.storyPart = 1; // Default si no se puede determinar
                         }
                     }
                     else
                     {
-                        card.storyPart = 1; // Default si no se puede determinar
+                        card.storyPart = 1;
                     }
                 }
 
-                // Descripción genérica
                 card.description = $"Una carta {cardInfo.rarity} de la colección BeikCookie";
-
-                Debug.Log($"Carta preparada para guardar: {card.id}, {card.name}, Tipo: {card.type}, Story: {card.storyId}, Part: {card.storyPart}");
                 newCards.Add(card);
             }
 
-            // Guardar cartas en DataManager
+            // Guardar cartas
             if (newCards.Count > 0)
             {
-                Debug.Log($"Enviando {newCards.Count} cartas nuevas a DataManager.AddCardsFromPack()");
+                Debug.Log($"Guardando {newCards.Count} cartas nuevas");
+
+                // Guardar en DataManager
                 DataManager.AddCardsFromPack(newCards);
 
-                // Verificar después de guardar
-                List<Card> allCards = DataManager.GetAllCards();
-                Debug.Log($"Verificación después de guardar: La colección tiene {allCards?.Count ?? 0} cartas en total");
-
-                // NUEVO: Guardar directamente cartas en PlayerPrefs para mayor seguridad
+                // IMPORTANTE: Guardar en sistema específico para Android
                 if (Application.platform == RuntimePlatform.Android)
                 {
-                    try
+                    // Obtener todas las cartas (incluyendo las nuevas)
+                    List<Card> allCards = DataManager.GetAllCards();
+                    AndroidCardDataManager.SaveCards(allCards);
+
+                    // Guardar referencia directa a las últimas cartas obtenidas
+                    string lastObtainedKey = "AndroidLastObtainedTime";
+                    PlayerPrefs.SetString(lastObtainedKey, System.DateTime.Now.ToString());
+                    PlayerPrefs.Save();
+
+                    // También guardar las cartas nuevas por separado como respaldo
+                    for (int i = 0; i < newCards.Count; i++)
                     {
-                        AndroidDataPersistence.SaveCards(allCards);
-                        Debug.Log("Respaldo adicional de todas las cartas guardado en AndroidDataPersistence");
+                        string key = "LastCard_" + i;
+                        string id = newCards[i].id;
+                        PlayerPrefs.SetString(key, id);
                     }
-                    catch (System.Exception e)
-                    {
-                        Debug.LogError($"Error al guardar respaldo adicional: {e.Message}");
-                    }
+                    PlayerPrefs.SetInt("LastCardsCount", newCards.Count);
+                    PlayerPrefs.Save();
                 }
 
-                // Guardar también en PlayerPrefs como respaldo usando método normal
-                try
-                {
-                    string cardsJson = JsonUtility.ToJson(new { cards = newCards });
-                    PlayerPrefs.SetString("LastObtainedCards", cardsJson);
-                    PlayerPrefs.Save();
-                    Debug.Log("Respaldo de últimas cartas guardado en PlayerPrefs");
-                }
-                catch (System.Exception e)
-                {
-                    Debug.LogError($"Error al guardar respaldo de cartas: {e.Message}");
-                }
+                // Verificar después de guardar
+                Debug.Log($"Verificación post-guardado: Total de cartas: {DataManager.GetAllCards().Count}");
             }
-            else
-            {
-                Debug.LogWarning("No se generaron cartas para guardar");
-            }
+            CardTransferSystem.StoreCards(newCards);
         }
         catch (System.Exception e)
         {
             Debug.LogError($"Error al guardar cartas: {e.Message}\n{e.StackTrace}");
         }
     }
+
+
+
     // AÑADIR ESTE NUEVO MÉTODO AL FINAL DEL PACKOPENING MANAGER
     private void OnApplicationPause(bool pause)
     {
