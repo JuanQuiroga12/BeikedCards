@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System.Collections;
@@ -76,11 +76,11 @@ public class PackOpeningManager : MonoBehaviour
         cardsRevealPanel.SetActive(false);
         resultScreen.SetActive(false);
 
-        // Obtener cÛdigo QR escaneado
+        // Obtener c√≥digo QR escaneado
         qrCode = PlayerPrefs.GetString("LastScannedQR", "");
         if (string.IsNullOrEmpty(qrCode))
         {
-            Debug.LogWarning("No se encontrÛ cÛdigo QR. Usando pack predeterminado.");
+            Debug.LogWarning("No se encontr√≥ c√≥digo QR. Usando pack predeterminado.");
             qrCode = System.DateTime.Now.Ticks.ToString(); // Semilla aleatoria
         }
 
@@ -90,8 +90,40 @@ public class PackOpeningManager : MonoBehaviour
         // Inicializar instrucciones
         instructionText.text = "Desliza para abrir el paquete";
 
-        // Configurar detecciÛn de corte
+        // Configurar detecci√≥n de corte
         cutLineArea.gameObject.AddComponent<PackCutter>().Initialize(this);
+    }
+
+    private void OnDestroy()
+    {
+        // Guardar datos antes de destruir el objeto (cambio de escena)
+        DataManager.SaveData();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            // Guardar datos cuando la app se pausa
+            DataManager.SaveData();
+        }
+        else
+        {
+            // Recargar datos cuando la app se reanuda
+            DataManager.LoadData();
+        }
+    }
+
+    private void OnEnable()
+    {
+        // Al activarse la escena, verificar que los datos est√©n actualizados
+        DataManager.LoadData();
+    }
+
+    private void OnDisable()
+    {
+        // Al desactivarse la escena, guardar datos
+        DataManager.SaveData();
     }
 
     private void GenerateCardsFromQR()
@@ -100,7 +132,7 @@ public class PackOpeningManager : MonoBehaviour
         int seed = qrCode.GetHashCode();
         Random.InitState(seed);
 
-        // Generar distribuciÛn: 3 Common, 2 Strange, 1 Deluxe
+        // Generar distribuci√≥n: 3 Common, 2 Strange, 1 Deluxe
         // Common cards
         for (int i = 0; i < 3; i++)
         {
@@ -127,7 +159,7 @@ public class PackOpeningManager : MonoBehaviour
             cardsToReveal.Add(card);
         }
 
-        // Deluxe card (el ˙ltimo mostrado)
+        // Deluxe card (el √∫ltimo mostrado)
         int deluxeIndex = Random.Range(0, deluxeCardPrefabs.Count);
         CardInfo deluxeCard = new CardInfo
         {
@@ -160,7 +192,7 @@ public class PackOpeningManager : MonoBehaviour
         if (packOpenSound != null)
             packOpenSound.Play();
 
-        // AnimaciÛn de apertura del paquete
+        // Animaci√≥n de apertura del paquete
         StartCoroutine(OpenPackAnimation());
     }
 
@@ -170,11 +202,11 @@ public class PackOpeningManager : MonoBehaviour
         // Verificar que resultCardsContainer no sea nulo
         if (resultCardsContainer == null)
         {
-            Debug.LogError("ResultCardsContainer no est· asignado en el Inspector. Por favor, asigne este campo.");
+            Debug.LogError("ResultCardsContainer no est√° asignado en el Inspector. Por favor, asigne este campo.");
             return;
         }
 
-        // Obtener o aÒadir Grid Layout Group
+        // Obtener o a√±adir Grid Layout Group
         GridLayoutGroup gridLayout = resultCardsContainer.GetComponent<GridLayoutGroup>();
 
 
@@ -182,8 +214,8 @@ public class PackOpeningManager : MonoBehaviour
         RectTransform rt = resultCardsContainer.GetComponent<RectTransform>();
 
 
-        // Configurar Grid Layout para cartas pequeÒas en 3 columnas
-        gridLayout.cellSize = new Vector2(300, 400); // Ajustar seg˙n necesidad
+        // Configurar Grid Layout para cartas peque√±as en 3 columnas
+        gridLayout.cellSize = new Vector2(300, 400); // Ajustar seg√∫n necesidad
         gridLayout.spacing = new Vector2(20, 20);
 
         // Asegurarse de que el Content Size Fitter funcione correctamente
@@ -203,7 +235,7 @@ public class PackOpeningManager : MonoBehaviour
 
         while (time < duration)
         {
-            // Animar paquete abriÈndose (escala, rotaciÛn, etc.)
+            // Animar paquete abri√©ndose (escala, rotaci√≥n, etc.)
             float t = time / duration;
             packObject.transform.localScale = Vector3.Lerp(Vector3.one, new Vector3(1.2f, 0.8f, 1), t);
             packObject.color = new Color(1, 1, 1, 1 - t);
@@ -212,11 +244,11 @@ public class PackOpeningManager : MonoBehaviour
             yield return null;
         }
 
-        // Cambiar a panel de revelaciÛn de cartas
+        // Cambiar a panel de revelaci√≥n de cartas
         packStage.SetActive(false);
         cardsRevealPanel.SetActive(true);
 
-        // Iniciar revelaciÛn de la primera carta
+        // Iniciar revelaci√≥n de la primera carta
         currentCardIndex = 0;
         RevealCurrentCard();
     }
@@ -232,7 +264,7 @@ public class PackOpeningManager : MonoBehaviour
         // Actualizar contador
         cardCounter.text = $"Carta {currentCardIndex + 1} de {cardsToReveal.Count}";
 
-        // Limpiar posiciÛn de display
+        // Limpiar posici√≥n de display
         foreach (Transform child in cardDisplayPosition)
         {
             Destroy(child.gameObject);
@@ -245,14 +277,14 @@ public class PackOpeningManager : MonoBehaviour
         GameObject cardObj = Instantiate(currentCard.cardPrefab, cardDisplayPosition);
         cardObj.transform.localPosition = Vector3.zero;
 
-        // Forzar posiciÛn en coordenadas de mundo
+        // Forzar posici√≥n en coordenadas de mundo
         cardObj.transform.position = cardDisplayPosition.position;
         cardObj.transform.localRotation = Quaternion.Euler(-90, 180, 0); // Rota 90 grados en X para enderezar la carta
 
-        // MantÈn la escala original del prefab o aj˙stala si es necesario
+        // Mant√©n la escala original del prefab o aj√∫stala si es necesario
         // cardObj.transform.localScale = Vector3.one;  // Descomentar si necesitas resetear la escala
 
-        Debug.Log($"Carta instanciada: {currentCard.cardPrefab.name} en posiciÛn MUNDO: {cardObj.transform.position}");
+        Debug.Log($"Carta instanciada: {currentCard.cardPrefab.name} en posici√≥n MUNDO: {cardObj.transform.position}");
 
         // Verificar si el renderer es visible
         Renderer renderer = cardObj.GetComponentInChildren<Renderer>();
@@ -264,10 +296,10 @@ public class PackOpeningManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning($"No se encontrÛ Renderer en {currentCard.cardPrefab.name}");
+            Debug.LogWarning($"No se encontr√≥ Renderer en {currentCard.cardPrefab.name}");
         }
 
-        // Animar revelaciÛn
+        // Animar revelaci√≥n
         StartCoroutine(AnimateCardReveal(cardObj, currentCard.rarity));
     }
 
@@ -279,11 +311,11 @@ public class PackOpeningManager : MonoBehaviour
         // Esperar un momento
         yield return new WaitForSeconds(0.5f);
 
-        // Reproducir efectos seg˙n rareza
-        // (cÛdigo existente para efectos)
+        // Reproducir efectos seg√∫n rareza
+        // (c√≥digo existente para efectos)
 
-        // CAMBIO 1: Aseg˙rate de que la carta estÈ siempre delante del Canvas
-        // Obtener el Canvas y poner la carta delante de Èl
+        // CAMBIO 1: Aseg√∫rate de que la carta est√© siempre delante del Canvas
+        // Obtener el Canvas y poner la carta delante de √©l
         Canvas mainCanvas = cardsRevealPanel.GetComponent<Canvas>();
         if (mainCanvas != null)
         {
@@ -294,44 +326,44 @@ public class PackOpeningManager : MonoBehaviour
                 // Asignar un sortingOrder mayor que el Canvas
                 renderer.sortingOrder = mainCanvas.sortingOrder + 1;
 
-                // Opcional: asignar un sortingLayerName especÌfico
+                // Opcional: asignar un sortingLayerName espec√≠fico
                 renderer.sortingLayerName = "ForegroundCards";
             }
         }
 
-        // CAMBIO 2: Modificar la animaciÛn para controlar la posiciÛn Z
+        // CAMBIO 2: Modificar la animaci√≥n para controlar la posici√≥n Z
         float duration = 1.0f;
         float time = 0;
 
         Quaternion startRot = card.transform.localRotation;
         Quaternion targetRot = Quaternion.Euler(90, 180, 0);
 
-        // PosiciÛn inicial
+        // Posici√≥n inicial
         Vector3 startPos = card.transform.position;
-        // Guardar la posiciÛn actual, pero ajustar Z para estar siempre delante
+        // Guardar la posici√≥n actual, pero ajustar Z para estar siempre delante
         Vector3 targetPos = startPos;
-        targetPos.z = startPos.z - 0.5f; // Acercar m·s a la c·mara
+        targetPos.z = startPos.z - 0.5f; // Acercar m√°s a la c√°mara
 
         while (time < duration)
         {
             float t = time / duration;
 
-            // RotaciÛn gradual
+            // Rotaci√≥n gradual
             card.transform.localRotation = Quaternion.Slerp(startRot, targetRot, t);
 
-            // InterpolaciÛn de posiciÛn para ajustar Z durante la rotaciÛn
-            // Esto evita que atraviese el fondo durante la rotaciÛn
+            // Interpolaci√≥n de posici√≥n para ajustar Z durante la rotaci√≥n
+            // Esto evita que atraviese el fondo durante la rotaci√≥n
             card.transform.position = Vector3.Lerp(startPos, targetPos, t);
 
             time += Time.deltaTime;
             yield return null;
         }
 
-        // Asegurar posiciÛn y rotaciÛn finales
+        // Asegurar posici√≥n y rotaci√≥n finales
         card.transform.localRotation = targetRot;
         card.transform.position = targetPos;
 
-        // Activar botÛn para continuar
+        // Activar bot√≥n para continuar
         tapToContinueButton.interactable = true;
         isRevealing = false;
     }
@@ -355,16 +387,16 @@ public class PackOpeningManager : MonoBehaviour
             // Para objetos UI (con RectTransform)
             GameObject glowObj = new GameObject("GlowEffect");
             glowObj.transform.SetParent(cardObject.transform);
-            glowObj.transform.SetAsFirstSibling(); // Poner detr·s de la carta
+            glowObj.transform.SetAsFirstSibling(); // Poner detr√°s de la carta
 
             // Configurar RectTransform
             RectTransform glowRT = glowObj.AddComponent<RectTransform>();
             glowRT.anchorMin = Vector2.zero;
             glowRT.anchorMax = Vector2.one;
-            glowRT.offsetMin = new Vector2(-10f, -10f); // Extender 10px en cada direcciÛn
+            glowRT.offsetMin = new Vector2(-10f, -10f); // Extender 10px en cada direcci√≥n
             glowRT.offsetMax = new Vector2(10f, 10f);
 
-            // AÒadir componente Image
+            // A√±adir componente Image
             Image glowImage = glowObj.AddComponent<Image>();
             glowImage.color = new Color(1f, 0.8f, 0.2f, 0.5f); // Color dorado semi-transparente
 
@@ -375,7 +407,7 @@ public class PackOpeningManager : MonoBehaviour
                 glowImage.sprite = glowSprite;
             }
 
-            // AÒadir animaciÛn de pulsaciÛn (opcional)
+            // A√±adir animaci√≥n de pulsaci√≥n (opcional)
             StartCoroutine(PulseGlowEffect(glowImage));
         }
         else
@@ -385,7 +417,7 @@ public class PackOpeningManager : MonoBehaviour
             GameObject glowObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
             glowObj.transform.SetParent(cardObject.transform);
             glowObj.transform.localPosition = Vector3.zero;
-            glowObj.transform.localScale = cardObject.transform.localScale * 1.1f; // Ligeramente m·s grande
+            glowObj.transform.localScale = cardObject.transform.localScale * 1.1f; // Ligeramente m√°s grande
 
             // Configurar material
             Renderer renderer = glowObj.GetComponent<Renderer>();
@@ -448,7 +480,7 @@ public class PackOpeningManager : MonoBehaviour
     private void ShowResultScreen()
     {
 
-        // Verificar componentes crÌticos
+        // Verificar componentes cr√≠ticos
         if (resultScreen == null || resultCardsContainer == null)
         {
             Debug.LogError("Referencias faltantes para mostrar la pantalla de resultados. Verifica en el Inspector.");
@@ -466,8 +498,8 @@ public class PackOpeningManager : MonoBehaviour
         if (backgroundImage != null)
             backgroundImage.color = new Color(1f, 0.8f, 0.8f, 1f); // Rosa claro
 
-        // Configurar tÌtulo
-        resultTitle.text = "°Cartas Obtenidas!";
+        // Configurar t√≠tulo
+        resultTitle.text = "¬°Cartas Obtenidas!";
 
         // Configurar layout ANTES de instanciar las cartas
         ConfigureResultCardLayout();
@@ -493,14 +525,14 @@ public class PackOpeningManager : MonoBehaviour
             else
             {
                 // Si es un objeto 3D
-                resultCard.transform.localRotation = Quaternion.Euler(90, 180, 0); // RotaciÛn para que mire al frente
+                resultCard.transform.localRotation = Quaternion.Euler(90, 180, 0); // Rotaci√≥n para que mire al frente
 
                 // Opcionalmente, crear un contenedor UI para los objetos 3D
                 GameObject uiContainer = new GameObject(resultCard.name + "_Container");
                 uiContainer.transform.SetParent(resultCardsContainer);
                 RectTransform containerRT = uiContainer.AddComponent<RectTransform>();
-                containerRT.position = resultCard.transform.position; // Mantener la posiciÛn del objeto 3D
-                containerRT.sizeDelta = new Vector2(300, 400); // TamaÒo igual al de la celda
+                containerRT.position = resultCard.transform.position; // Mantener la posici√≥n del objeto 3D
+                containerRT.sizeDelta = new Vector2(300, 400); // Tama√±o igual al de la celda
 
                 // Mover el objeto 3D al contenedor UI
                 resultCard.transform.SetParent(uiContainer.transform);
@@ -529,7 +561,7 @@ public class PackOpeningManager : MonoBehaviour
         // Esperar un frame para que el layout se actualice
         StartCoroutine(FixLayoutAfterDelay());
 
-        // Guardar informaciÛn de cartas obtenidas
+        // Guardar informaci√≥n de cartas obtenidas
         SaveObtainedCards();
     }
 
@@ -538,13 +570,13 @@ public class PackOpeningManager : MonoBehaviour
         // Esperar un frame para que todos los componentes se inicialicen
         yield return null;
 
-        // Forzar actualizaciÛn de layout
+        // Forzar actualizaci√≥n de layout
         LayoutRebuilder.ForceRebuildLayoutImmediate(resultCardsContainer.GetComponent<RectTransform>());
 
         // Esperar otro frame
         yield return null;
 
-        // Verificar posiciÛn de cada carta para debugging
+        // Verificar posici√≥n de cada carta para debugging
         int index = 0;
         foreach (Transform child in resultCardsContainer)
         {
@@ -552,11 +584,11 @@ public class PackOpeningManager : MonoBehaviour
             RectTransform rectTransform = child.GetComponent<RectTransform>();
             if (rectTransform != null)
             {
-                Debug.Log($"Carta {index}: PosiciÛn = {child.localPosition}, RectPosition = {rectTransform.anchoredPosition}");
+                Debug.Log($"Carta {index}: Posici√≥n = {child.localPosition}, RectPosition = {rectTransform.anchoredPosition}");
             }
             else
             {
-                Debug.Log($"Carta {index}: PosiciÛn = {child.localPosition}, No tiene RectTransform");
+                Debug.Log($"Carta {index}: Posici√≥n = {child.localPosition}, No tiene RectTransform");
             }
             index++;
         }
@@ -564,16 +596,17 @@ public class PackOpeningManager : MonoBehaviour
 
     private void SaveObtainedCards()
     {
+        Debug.Log("üÉè GUARDANDO CARTAS: Inicio del proceso");
+
         try
         {
-            List<Card> newCards = new List<Card>();
-
-            // Verificar que DataManager estÈ inicializado
-            if (DataManager.GetAllCards() == null)
+            if (DataManager.GetCurrentUsername() == null)
             {
                 Debug.LogWarning("DataManager no inicializado. Inicializando...");
                 DataManager.Initialize();
             }
+
+            List<Card> newCards = new List<Card>();
 
             // Convertir CardInfo a Card para guardar
             foreach (CardInfo cardInfo in cardsToReveal)
@@ -585,7 +618,7 @@ public class PackOpeningManager : MonoBehaviour
                 }
 
                 Card card = new Card();
-                card.id = System.Guid.NewGuid().ToString(); // ID ˙nico
+                card.id = System.Guid.NewGuid().ToString(); // ID √∫nico
 
                 // Determinar nombre y tipo basado en prefab
                 string prefabName = cardInfo.cardPrefab.name;
@@ -610,123 +643,119 @@ public class PackOpeningManager : MonoBehaviour
 
                 // Determinar storyId y storyPart basados en el nombre
                 string[] parts = prefabName.Split('-');
-                if (parts.Length > 0)
+                if (parts.Length >= 2)
                 {
-                    card.storyId = "story_" + parts[0];
+                    // El formato esperado es "1-Common-Cinnamon" o similar
 
-                    // Intenta determinar storyPart basado en el nombre
-                    // El formato del nombre serÌa como "1-Common-Cinnamon"
-                    if (parts.Length > 1)
+                    // Extraer storyId de la primera parte (el n√∫mero)
+                    if (int.TryParse(parts[0], out int storyNumber))
                     {
-                        if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
+                        card.storyId = "story_" + storyNumber;
+                    }
+                    else
+                    {
+                        card.storyId = "story_1"; // Valor por defecto
+                        Debug.LogWarning($"üÉè ADVERTENCIA: No se pudo determinar storyId para {prefabName}");
+                    }
+
+                    // Asignar storyPart basado en la parte espec√≠fica de la carta
+                    // CORRECI√ìN: Usar un sistema consistente y claro
+                    if (parts.Length >= 3)
+                    {
+                        // Extraer storyPart del nombre espec√≠fico
+                        // NUEVO: Mapeo directo y expl√≠cito para cada tipo de carta
+                        string cardSpecificName = parts[2];
+
+                        // Story 1 mappings
+                        if (parts[0] == "1")
                         {
-                            // Determinar cu·l de las tres cartas comunes es
-                            if (prefabName.Contains("Cinnamon"))
-                                card.storyPart = 1;
-                            else if (prefabName.Contains("Klim"))
-                                card.storyPart = 2;
-                            else
-                                card.storyPart = 3;
+                            if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (cardSpecificName.Contains("Cinnamon")) card.storyPart = 1;
+                                else if (cardSpecificName.Contains("Klim")) card.storyPart = 2;
+                                else if (cardSpecificName.Contains("Kinder")) card.storyPart = 3;
+                                else card.storyPart = 1;
+                            }
+                            else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (cardSpecificName.Contains("Birthday")) card.storyPart = 1;
+                                else if (cardSpecificName.Contains("Milo")) card.storyPart = 2;
+                                else card.storyPart = 1;
+                            }
+                            else card.storyPart = 1; // Deluxe siempre es 1
                         }
-                        else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
+                        // Story 2 mappings
+                        else if (parts[0] == "2")
                         {
-                            // Determinar cu·l de las dos cartas Strange es
-                            if (prefabName.Contains("Birthday"))
-                                card.storyPart = 1;
-                            else
-                                card.storyPart = 2;
+                            if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (cardSpecificName.Contains("ChocolateChips")) card.storyPart = 1;
+                                else if (cardSpecificName.Contains("KeyLimePie")) card.storyPart = 2;
+                                else if (cardSpecificName.Contains("CaramelPecans")) card.storyPart = 3;
+                                else card.storyPart = 1;
+                            }
+                            else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (cardSpecificName.Contains("Birthday")) card.storyPart = 1;
+                                else if (cardSpecificName.Contains("Klim")) card.storyPart = 2;
+                                else card.storyPart = 1;
+                            }
+                            else card.storyPart = 1; // Deluxe siempre es 1
                         }
-                        else
+                        // Story 3 mappings
+                        else if (parts[0] == "3")
                         {
-                            card.storyPart = 1; // Para Deluxe
+                            if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (cardSpecificName.Contains("ChocolateChips")) card.storyPart = 1;
+                                else if (cardSpecificName.Contains("Cinnamon")) card.storyPart = 2;
+                                else if (cardSpecificName.Contains("KeyLimePie")) card.storyPart = 3;
+                                else card.storyPart = 1;
+                            }
+                            else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (cardSpecificName.Contains("LaDeMilo")) card.storyPart = 1;
+                                else if (cardSpecificName.Contains("MoltenLava")) card.storyPart = 2;
+                                else card.storyPart = 1;
+                            }
+                            else card.storyPart = 1; // Deluxe siempre es 1
                         }
                     }
                     else
                     {
-                        card.storyPart = 1; // Default si no se puede determinar
-                    }
-
-                    if (parts.Length > 2)
-                    {
-                        if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Determinar cu·l de las tres cartas comunes es
-                            if (prefabName.Contains("ChocolateChips"))
-                                card.storyPart = 1;
-                            else if (prefabName.Contains("KeyLimePie"))
-                                card.storyPart = 2;
-                            else
-                                card.storyPart = 3;
-                        }
-                        else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Determinar cu·l de las dos cartas Strange es
-                            if (prefabName.Contains("Birthday"))
-                                card.storyPart = 1;
-                            else
-                                card.storyPart = 2;
-                        }
-                        else
-                        {
-                            card.storyPart = 1; // Para Deluxe
-                        }
-                    }
-                    else
-                    {
-                        card.storyPart = 1; // Default si no se puede determinar
-                    }
-
-                    if (parts.Length > 3)
-                    {
-                        if (parts[1].Equals("Common", System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Determinar cu·l de las tres cartas comunes es
-                            if (prefabName.Contains("ChocolateChips"))
-                                card.storyPart = 1;
-                            else if (prefabName.Contains("Cinnamon"))
-                                card.storyPart = 2;
-                            else
-                                card.storyPart = 3;
-                        }
-                        else if (parts[1].Equals("Strange", System.StringComparison.OrdinalIgnoreCase))
-                        {
-                            // Determinar cu·l de las dos cartas Strange es
-                            if (prefabName.Contains("LaDeMilo"))
-                                card.storyPart = 1;
-                            else
-                                card.storyPart = 2;
-                        }
-                        else
-                        {
-                            card.storyPart = 1; // Para Deluxe
-                        }
-                    }
-                    else
-                    {
-                        card.storyPart = 1; // Default si no se puede determinar
+                        card.storyPart = 1; // Valor por defecto
                     }
                 }
+                else
+                {
+                    // Formato de nombre no reconocido
+                    card.storyId = "story_1";
+                    card.storyPart = 1;
+                    Debug.LogWarning($"üÉè ADVERTENCIA: Formato de nombre no reconocido: {prefabName}");
+                }
 
-                // DescripciÛn genÈrica
-                card.description = $"Una carta {cardInfo.rarity} de la colecciÛn BeikCookie";
+                // Logging detallado para diagn√≥stico
+                Debug.Log($"üÉè CARTA CREADA: ID={card.id}, Nombre={prefabName}, " +
+                          $"Historia={card.storyId}, Parte={card.storyPart}, Tipo={card.type}");
 
                 newCards.Add(card);
             }
 
-            // Guardar cartas en DataManager
+            // Guardar todas las cartas
             if (newCards.Count > 0)
             {
+                Debug.Log($"üÉè GUARDANDO: {newCards.Count} cartas nuevas");
                 DataManager.AddCardsFromPack(newCards);
-                Debug.Log($"Se han guardado {newCards.Count} cartas nuevas en la colecciÛn");
+                Debug.Log("üÉè GUARDADO COMPLETADO");
             }
             else
             {
-                Debug.LogWarning("No se generaron cartas para guardar");
+                Debug.LogWarning("üÉè ADVERTENCIA: No hay cartas para guardar");
             }
         }
         catch (System.Exception e)
         {
-            Debug.LogError($"Error al guardar cartas: {e.Message}\n{e.StackTrace}");
+            Debug.LogError($"üÉè ERROR GUARDANDO CARTAS: {e.Message}\n{e.StackTrace}");
         }
     }
 }

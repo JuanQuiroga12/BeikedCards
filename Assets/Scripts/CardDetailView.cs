@@ -105,6 +105,26 @@ public class CardDetailView : MonoBehaviour
         rotationInstructions.SetActive(false);
     }
 
+    private void OnDestroy()
+    {
+        // Guardar datos antes de destruir el objeto (cambio de escena)
+        DataManager.SaveData();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            // Guardar datos cuando la app se pausa
+            DataManager.SaveData();
+        }
+        else
+        {
+            // Recargar datos cuando la app se reanuda
+            DataManager.LoadData();
+        }
+    }
+
     private void LoadSelectedCard()
     {
         // Obtener ID y nombre del prefab de la carta seleccionada

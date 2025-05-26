@@ -15,6 +15,9 @@ EditorBuildSettings:
     path: Assets/Scenes/QRScanScene.unity
     guid: e71398cca56f5d64f8f8d86575822e51
   - enabled: 1
+    path: Assets/Scenes/PackOpeningScene.unity
+    guid: b05ae1d631075424d82c62fa90b4b667
+  - enabled: 1
     path: Assets/Scenes/CollectionScene.unity
     guid: 70926fe4aba67cc46afd3c9df210d984
   - enabled: 1
@@ -23,9 +26,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/CookieRedemptionScene.unity
     guid: d605a4f0419a28d4d8e53074fba89ae9
-  - enabled: 1
-    path: Assets/Scenes/PackOpeningScene.unity
-    guid: b05ae1d631075424d82c62fa90b4b667
   m_configObjects:
     UnityEditor.XR.ARCore.ARCoreSettings: {fileID: 11400000, guid: 5115ce5b225f75a4cb50601c20b0d915,
       type: 2}

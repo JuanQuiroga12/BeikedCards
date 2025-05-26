@@ -18,6 +18,14 @@ public class LoginManager : MonoBehaviour
         loginButton.onClick.AddListener(Login);
         registerButton.onClick.AddListener(Register);
 
+        // Verificar si ya existe un DataSaveManager
+        if (FindObjectOfType<DataSaveManager>() == null)
+        {
+            GameObject saveManagerObj = new GameObject("DataSaveManager");
+            saveManagerObj.AddComponent<DataSaveManager>();
+            Debug.Log("DataSaveManager creado");
+        }
+
     }
 
     private void Login()
@@ -44,6 +52,12 @@ public class LoginManager : MonoBehaviour
             statusText.text = "Contraseña incorrecta";
             return;
         }
+        // Al final del método Login() y Register()
+        PlayerPrefs.SetString("CurrentUser", username);
+        PlayerPrefs.Save();  // Forzar guardado inmediato en Android
+
+        // ¡NUEVO! - Asegurarse de cargar los datos del usuario correcto
+        DataManager.SwitchUser(username);
 
         // Guarda el usuario activo
         PlayerPrefs.SetString("CurrentUser", username);
@@ -74,8 +88,9 @@ public class LoginManager : MonoBehaviour
         // Guarda la contraseña para este usuario
         PlayerPrefs.SetString(username, password);
 
-        // Guarda el usuario activo
+        // Al final del método Login() y Register()
         PlayerPrefs.SetString("CurrentUser", username);
+        PlayerPrefs.Save();  // Forzar guardado inmediato en Android
 
         statusText.text = "¡Registro exitoso!";
 

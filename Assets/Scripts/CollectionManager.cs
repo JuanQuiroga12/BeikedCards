@@ -65,8 +65,14 @@ public class CollectionManager : MonoBehaviour
 
     private void Start()
     {
-        // Inicializar DataManager
+        Debug.Log("CollectionManager: Iniciando...");
+
+        // Asegurarse de que DataManager esté inicializado
         DataManager.Initialize();
+
+        // Forzar una recarga de datos para asegurar que tenemos los datos más recientes
+        Debug.Log("CollectionManager: Forzando carga de datos...");
+        DataManager.LoadData();
 
         // Verificar recursos de cartas
         VerifyCardResources();
@@ -77,11 +83,68 @@ public class CollectionManager : MonoBehaviour
         else
             Debug.LogWarning("BackButton no asignado, no se puede configurar la navegación de retorno");
 
+        // Añadir un retardo antes de cargar las colecciones para dar tiempo al sistema de archivos
+        Invoke("LoadCollectionsWithDelay", 0.5f);
+
         // Configurar layout del contenedor principal
         ConfigureCollectionLayout();
 
         // Cargar todas las colecciones
         LoadCollections();
+
+    }
+
+    private void LoadCollectionsWithDelay()
+    {
+        // Forzar una carga explícita para asegurar datos actualizados
+        DataManager.LoadData();
+
+        // Depuración detallada
+        List<Card> allCards = DataManager.GetAllCards();
+        Debug.Log($"⭐ COLECCIÓN: Total de cartas disponibles: {(allCards != null ? allCards.Count : 0)}");
+
+        // Muestra información de cada carta para diagnóstico
+        if (allCards != null)
+        {
+            foreach (Card card in allCards)
+            {
+                Debug.Log($"⭐ CARTA: ID={card.id}, Tipo={card.type}, Historia={card.storyId}, Parte={card.storyPart}");
+            }
+        }
+
+        // Cargar colecciones con los datos actualizados
+        LoadCollections();
+    }
+
+    private void OnDestroy()
+    {
+        // Guardar datos antes de destruir el objeto (cambio de escena)
+        DataManager.SaveData();
+    }
+    private void OnEnable()
+    {
+        // Al activarse la escena, verificar que los datos estén actualizados
+        DataManager.LoadData();
+    }
+
+    private void OnDisable()
+    {
+        // Al desactivarse la escena, guardar datos
+        DataManager.SaveData();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            // Guardar datos cuando la app se pausa
+            DataManager.SaveData();
+        }
+        else
+        {
+            // Recargar datos cuando la app se reanuda
+            DataManager.LoadData();
+        }
     }
 
     // Agregar este método a CollectionManager.cs

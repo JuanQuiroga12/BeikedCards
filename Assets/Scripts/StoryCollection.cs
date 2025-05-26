@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
@@ -21,7 +21,7 @@ public class StoryCollection : MonoBehaviour
 
     private void Start()
     {
-        // Configurar contenedores de cartas con tama�os apropiados
+        // Configurar contenedores de cartas con tamaños apropiados
         if (commonCardsContainer != null)
         {
             RectTransform rectTransform = commonCardsContainer.GetComponent<RectTransform>();
@@ -44,8 +44,8 @@ public class StoryCollection : MonoBehaviour
         // Similar para strangeCardsContainer y deluxeCardContainer
         // ...
 
-        // Configurar contenedores de cartas con tama�os apropiados
-        if (commonCardsContainer != null)
+        // Configurar contenedores de cartas con tamaños apropiados
+        if (strangeCardsContainer != null)
         {
             RectTransform rectTransform = strangeCardsContainer.GetComponent<RectTransform>();
             if (rectTransform != null)
@@ -64,7 +64,7 @@ public class StoryCollection : MonoBehaviour
             }
         }
 
-        if (commonCardsContainer != null)
+        if (deluxeCardContainer != null)
         {
             RectTransform rectTransform = deluxeCardContainer.GetComponent<RectTransform>();
             if (rectTransform != null)
@@ -81,7 +81,7 @@ public class StoryCollection : MonoBehaviour
 
         ConfigureCardContainers();
 
-        // Cargar todas las cartas de esta colecci�n
+        // Cargar todas las cartas de esta colección
         LoadStoryCards(cardToPrefabMap);
 
         // Verificar completitud
@@ -104,7 +104,22 @@ public class StoryCollection : MonoBehaviour
         {
             // Obtener todas las cartas de esta historia
             List<Card> storyCards = DataManager.GetCardsByStory(storyId);
-            hasAnyCards = storyCards != null && storyCards.Count > 0;
+            // Log detallado de cartas encontradas
+            Debug.Log($"🎴 COLECCIÓN: {storyId} - Total cartas: {(storyCards != null ? storyCards.Count : 0)}");
+
+            if (storyCards != null && storyCards.Count > 0)
+            {
+                foreach (Card card in storyCards)
+                {
+                    Debug.Log($"🎴 CARTA ENCONTRADA: ID={card.id}, Tipo={card.type}, Parte={card.storyPart}, Nombre={card.name}");
+                }
+                hasAnyCards = true;
+            }
+            else
+            {
+                Debug.Log($"🎴 NO HAY CARTAS para historia {storyId}");
+                hasAnyCards = false;
+            }
 
             // Para limpiar slots anteriores
             if (commonCardsContainer != null)
@@ -151,10 +166,12 @@ public class StoryCollection : MonoBehaviour
                         if (cardToPrefabMap.TryGetValue(cardKey, out string prefabName))
                         {
                             slot.SetCard(card, prefabName);
+                            Debug.Log($"🎴 ASIGNANDO: Carta Common parte {i} encontrada: {card.name}");
                         }
                         else
                         {
                             Debug.LogWarning($"Clave no encontrada en el mapeo: {cardKey}");
+                            Debug.Log($"🎴 SLOT VACÍO: No se encontró carta Common parte {i}");
                             slot.SetEmpty();
                         }
                     }
@@ -196,10 +213,12 @@ public class StoryCollection : MonoBehaviour
                         if (cardToPrefabMap.TryGetValue(cardKey, out string prefabName))
                         {
                             slot.SetCard(card, prefabName);
+                            Debug.Log($"🎴 ASIGNANDO: Carta Strange parte {i} encontrada: {card.name}");
                         }
                         else
                         {
                             Debug.LogWarning($"Clave no encontrada en el mapeo: {cardKey}");
+                            Debug.Log($"🎴 SLOT VACÍO: No se encontró carta Strange parte {i}");
                             slot.SetEmpty();
                         }
                     }
@@ -239,10 +258,12 @@ public class StoryCollection : MonoBehaviour
                     if (cardToPrefabMap.TryGetValue(deluxeKey, out string prefabName))
                     {
                         deluxeSlot.SetCard(deluxeCard, prefabName);
+                        Debug.Log($"🎴 ASIGNANDO: Carta Deluxe encontrada: {deluxeCard.name}");
                     }
                     else
                     {
                         Debug.LogWarning($"Clave no encontrada en el mapeo: {deluxeKey}");
+                        Debug.Log($"🎴 SLOT VACÍO: No se encontró carta Deluxe");
                         deluxeSlot.SetEmpty();
                     }
                 }
@@ -262,9 +283,42 @@ public class StoryCollection : MonoBehaviour
         }
     }
 
+
+    private void OnDestroy()
+    {
+        // Guardar datos antes de destruir el objeto (cambio de escena)
+        DataManager.SaveData();
+    }
+
+    private void OnApplicationPause(bool pause)
+    {
+        if (pause)
+        {
+            // Guardar datos cuando la app se pausa
+            DataManager.SaveData();
+        }
+        else
+        {
+            // Recargar datos cuando la app se reanuda
+            DataManager.LoadData();
+        }
+    }
+
+    private void OnEnable()
+    {
+        // Al activarse la escena, verificar que los datos estén actualizados
+        DataManager.LoadData();
+    }
+
+    private void OnDisable()
+    {
+        // Al desactivarse la escena, guardar datos
+        DataManager.SaveData();
+    }
+
     private void CheckCompletion()
     {
-        // Verificar si ya est� marcada como completa
+        // Verificar si ya está marcada como completa
         if (DataManager.IsStoryComplete(storyId))
         {
             isComplete = true;
@@ -283,10 +337,10 @@ public class StoryCollection : MonoBehaviour
         // Verificar Deluxe (necesitamos 1)
         int deluxeCount = storyCards.FindAll(c => c.type == CardType.DeluxeBeiked).Count;
 
-        // Est� completa si tenemos todas las cartas necesarias
+        // Está completa si tenemos todas las cartas necesarias
         isComplete = (commonCount >= 3 && strangeCount >= 2 && deluxeCount >= 1);
 
-        // Si est� completa, marcarla como tal
+        // Si está completa, marcarla como tal
         if (isComplete)
         {
             DataManager.AddCompletedStory(storyId);
@@ -298,7 +352,7 @@ public class StoryCollection : MonoBehaviour
         // Guardar referencia a la historia para redimir
         PlayerPrefs.SetString("RedeemStoryId", storyId);
 
-        // Cargar escena de redenci�n
+        // Cargar escena de redención
         SceneManager.LoadScene("CookieRedemptionScene");
     }
 
@@ -313,11 +367,11 @@ public class StoryCollection : MonoBehaviour
 
         if (!string.IsNullOrEmpty(code))
         {
-            // Crear un panel para mostrar el c�digo
+            // Crear un panel para mostrar el código
             GameObject codePanel = new GameObject("CodePanel");
             codePanel.transform.SetParent(transform);
 
-            // A�adir componentes UI
+            // Añadir componentes UI
             RectTransform rt = codePanel.AddComponent<RectTransform>();
             rt.anchorMin = new Vector2(0.5f, 0.5f);
             rt.anchorMax = new Vector2(1080.0f, 1920.0f);
@@ -328,11 +382,11 @@ public class StoryCollection : MonoBehaviour
             Image bg = codePanel.AddComponent<Image>();
             bg.color = new Color(0.9f, 0.9f, 0.9f, 0.95f);
 
-            // Texto del c�digo
+            // Texto del código
             GameObject textObj = new GameObject("CodeText");
             textObj.transform.SetParent(codePanel.transform);
             TextMeshProUGUI codeText = textObj.AddComponent<TextMeshProUGUI>();
-            codeText.text = "Tu c�digo de galleta:\n\n" + code;
+            codeText.text = "Tu código de galleta:\n\n" + code;
             codeText.fontSize = 24;
             codeText.alignment = TextAlignmentOptions.Center;
 
@@ -342,7 +396,7 @@ public class StoryCollection : MonoBehaviour
             textRT.offsetMin = new Vector2(20, 60);
             textRT.offsetMax = new Vector2(-20, -20);
 
-            // Bot�n para cerrar
+            // Botón para cerrar
             GameObject closeButtonObj = new GameObject("CloseButton");
             closeButtonObj.transform.SetParent(codePanel.transform);
             Button closeButton = closeButtonObj.AddComponent<Button>();
@@ -356,7 +410,7 @@ public class StoryCollection : MonoBehaviour
             closeButtonRT.sizeDelta = new Vector2(120, 40);
             closeButtonRT.anchoredPosition = new Vector2(0, 20);
 
-            // Texto del bot�n
+            // Texto del botón
             GameObject closeTextObj = new GameObject("CloseText");
             closeTextObj.transform.SetParent(closeButtonObj.transform);
             TextMeshProUGUI closeText = closeTextObj.AddComponent<TextMeshProUGUI>();
@@ -380,8 +434,8 @@ public class StoryCollection : MonoBehaviour
         // Obtener las cartas de esta historia
         List<Card> storyCards = DataManager.GetCardsByStory(storyId);
 
-        // Imprimir informaci�n
-        Debug.Log($"Historia: {storyId}, T�tulo: {storyTitleText.text}");
+        // Imprimir información
+        Debug.Log($"Historia: {storyId}, Título: {storyTitleText.text}");
         Debug.Log($"Total de cartas para esta historia: {(storyCards != null ? storyCards.Count : 0)}");
 
         if (storyCards != null)
@@ -416,7 +470,7 @@ public class StoryCollection : MonoBehaviour
             layout.childForceExpandHeight = false;
         }
 
-        // Configuraci�n similar para Strange y Deluxe
+        // Configuración similar para Strange y Deluxe
         if (strangeCardsContainer != null)
         {
             RectTransform rectTransform = strangeCardsContainer.GetComponent<RectTransform>();
@@ -443,7 +497,7 @@ public class StoryCollection : MonoBehaviour
                 rectTransform.sizeDelta = new Vector2(800, 150);
             }
 
-            // Para el contenedor de Deluxe, podr�amos usar HorizontalLayoutGroup tambi�n
+            // Para el contenedor de Deluxe, podríamos usar HorizontalLayoutGroup también
             // para mantener consistencia, aunque solo tenga una carta
             HorizontalLayoutGroup layout = deluxeCardContainer.GetComponent<HorizontalLayoutGroup>();
             if (layout == null)
