@@ -12,21 +12,22 @@ public class RotationLimiter : MonoBehaviour
     [SerializeField] private float maxXRotation = 30f;
 
     [Header("Speed Settings")]
-    [SerializeField] private float rotationSensitivity = 1.0f;
+    [SerializeField] private float rotationSensitivity = 100.0f;
     [SerializeField] private float returnSpeed = 3.0f;
-    [SerializeField] private float quickFlipThreshold = 800f; // Velocity threshold for quick flips
+    [SerializeField] private float quickFlipThreshold = 800f;
 
     [Header("Default Settings")]
-    [SerializeField] private Vector3 defaultRotation = new Vector3(0, 180, 0);
+    [SerializeField] private Vector3 defaultRotation = new Vector3(90, 180, 0);
     [SerializeField] private bool returnToDefaultOnRelease = true;
 
     // Internal tracking variables
     private bool isDragging = false;
-    private Vector2 previousMousePosition;
+    private Vector2 previousPosition;
     private float dragTime = 0f;
     private Vector2 dragVelocity;
     private Vector3 targetRotation;
     private bool isFlipped = false;
+    private bool isMobileDevice;
 
     private void Start()
     {
@@ -35,10 +36,21 @@ public class RotationLimiter : MonoBehaviour
             targetTransform = transform.parent;
         }
 
+        // Detectar si estamos en dispositivo móvil
+        isMobileDevice = Touchscreen.current != null;
+        Debug.Log($"Dispositivo móvil detectado: {isMobileDevice}");
+
         // Initialize rotation to default
         if (targetTransform != null)
         {
+            // Si estamos en CardDetailView, la tarjeta ya tendrá la rotación correcta
+            if (targetTransform.localRotation != Quaternion.identity)
+            {
+                defaultRotation = targetTransform.localRotation.eulerAngles;
+            }
+
             targetRotation = defaultRotation;
+            Debug.Log($"Rotación inicial: {defaultRotation}");
         }
     }
 
@@ -49,7 +61,8 @@ public class RotationLimiter : MonoBehaviour
         // Reset rotation when changing target
         if (targetTransform != null)
         {
-            targetTransform.localRotation = Quaternion.Euler(defaultRotation);
+            // Preservar la rotación actual como predeterminada
+            defaultRotation = targetTransform.localRotation.eulerAngles;
             targetRotation = defaultRotation;
         }
     }
@@ -58,45 +71,107 @@ public class RotationLimiter : MonoBehaviour
     {
         if (targetTransform == null) return;
 
-        // Handle input
-        HandleInput();
+        // Usar el handler adecuado según el dispositivo
+        if (isMobileDevice)
+        {
+            HandleTouchInput();
+        }
+        else
+        {
+            HandleMouseInput();
+        }
 
         // Apply rotation with smoothing
         ApplyRotation();
     }
 
-    private void HandleInput()
+    private void HandleTouchInput()
     {
-        // Get current mouse state
+        Touchscreen touchscreen = Touchscreen.current;
+        if (touchscreen == null || !touchscreen.primaryTouch.isInProgress) return;
+
+        Vector2 touchPosition = touchscreen.primaryTouch.position.ReadValue();
+        bool touchPressed = touchscreen.primaryTouch.press.isPressed;
+        bool touchBegan = touchscreen.primaryTouch.press.wasPressedThisFrame;
+        bool touchEnded = touchscreen.primaryTouch.press.wasReleasedThisFrame;
+
+        // Comenzar arrastre
+        if (touchBegan)
+        {
+            isDragging = true;
+            previousPosition = touchPosition;
+            dragTime = Time.time;
+            dragVelocity = Vector2.zero;
+            Debug.Log("Toque iniciado");
+        }
+        // Finalizar arrastre
+        else if (touchEnded)
+        {
+            // Calcular velocidad para detectar gesto rápido
+            Vector2 currentVelocity = CalculateDragVelocity(touchPosition);
+
+            // Detectar gesto de volteo
+            if (Mathf.Abs(currentVelocity.x) > quickFlipThreshold)
+            {
+                PerformQuickFlip(currentVelocity.x > 0);
+            }
+
+            isDragging = false;
+            Debug.Log("Toque finalizado");
+        }
+
+        // Procesar arrastre
+        if (isDragging && touchPressed)
+        {
+            // SOLO aplicar rotación horizontal
+            float deltaX = touchPosition.x - previousPosition.x;
+
+            // Mantener rotación vertical fija
+            float baseYRotation = isFlipped ? 0 : 180;
+
+            // SOLO modificar Y, manteniendo X y Z fijos en sus valores originales
+            targetRotation = new Vector3(
+                defaultRotation.x,
+                targetRotation.y - (deltaX * rotationSensitivity * 0.1f),
+                defaultRotation.z
+            );
+
+            // Actualizar para próximo frame
+            dragVelocity = CalculateDragVelocity(touchPosition);
+            previousPosition = touchPosition;
+            dragTime = Time.time;
+        }
+        else if (!isDragging && returnToDefaultOnRelease)
+        {
+            // Volver a posición según estado de flip
+            Vector3 returnTarget = isFlipped ?
+                new Vector3(defaultRotation.x, 0, defaultRotation.z) :
+                defaultRotation;
+
+            targetRotation = Vector3.Lerp(targetRotation, returnTarget, returnSpeed * Time.deltaTime);
+        }
+    }
+
+    private void HandleMouseInput()
+    {
         Mouse mouse = Mouse.current;
         if (mouse == null) return;
 
-        // Get current touch state (for mobile)
-        Touchscreen touchscreen = Touchscreen.current;
-        bool isTouching = touchscreen != null && touchscreen.primaryTouch.press.isPressed;
-
-        // Current pointer position (mouse or touch)
-        Vector2 pointerPosition = mouse.position.ReadValue();
-        if (isTouching && touchscreen != null)
-        {
-            pointerPosition = touchscreen.primaryTouch.position.ReadValue();
-        }
+        Vector2 mousePosition = mouse.position.ReadValue();
 
         // Start dragging
-        if (mouse.leftButton.wasPressedThisFrame || (touchscreen != null && touchscreen.primaryTouch.press.wasPressedThisFrame))
+        if (mouse.leftButton.wasPressedThisFrame)
         {
             isDragging = true;
-            previousMousePosition = pointerPosition;
+            previousPosition = mousePosition;
             dragTime = Time.time;
             dragVelocity = Vector2.zero;
         }
         // End dragging
-        else if (mouse.leftButton.wasReleasedThisFrame || (isTouching && touchscreen != null && touchscreen.primaryTouch.press.wasReleasedThisFrame))
+        else if (mouse.leftButton.wasReleasedThisFrame)
         {
-            // Calculate final velocity
-            Vector2 currentVelocity = CalculateDragVelocity(pointerPosition);
+            Vector2 currentVelocity = CalculateDragVelocity(mousePosition);
 
-            // Check for quick flip
             if (Mathf.Abs(currentVelocity.x) > quickFlipThreshold)
             {
                 PerformQuickFlip(currentVelocity.x > 0);
@@ -106,38 +181,36 @@ public class RotationLimiter : MonoBehaviour
         }
 
         // Process dragging
-        if (isDragging)
+        if (isDragging && mouse.leftButton.isPressed)
         {
-            // Calculate relative position to screen center
+            // Calcular posición relativa (para PC funciona bien así)
             Vector2 screenCenter = new Vector2(Screen.width * 0.5f, Screen.height * 0.5f);
             Vector2 mouseOffset = new Vector2(
-                (screenCenter.x - pointerPosition.x) / screenCenter.x,
-                (screenCenter.y - pointerPosition.y) / screenCenter.y
+                (screenCenter.x - mousePosition.x) / screenCenter.x,
+                (screenCenter.y - mousePosition.y) / screenCenter.y
             );
 
-            // Calculate base rotation
+            // Calcular rotación base
             float baseYRotation = isFlipped ? 0 : 180;
 
-            // Create look-at-mouse effect with limits
+            // Efecto look-at-mouse
             targetRotation = new Vector3(
-                Mathf.Clamp(-mouseOffset.y * 30f, minXRotation, maxXRotation),
+                defaultRotation.x + Mathf.Clamp(-mouseOffset.y * 30f, minXRotation, maxXRotation),
                 baseYRotation + mouseOffset.x * 40f,
-                0
+                defaultRotation.z
             );
 
-            // Update drag velocity
-            dragVelocity = CalculateDragVelocity(pointerPosition);
-            previousMousePosition = pointerPosition;
+            // Actualizar tracking
+            dragVelocity = CalculateDragVelocity(mousePosition);
+            previousPosition = mousePosition;
             dragTime = Time.time;
         }
-        else if (returnToDefaultOnRelease)
+        else if (!isDragging && returnToDefaultOnRelease)
         {
-            // Calculate the default rotation based on flip state
             Vector3 returnTarget = isFlipped ?
-                new Vector3(0, 0, 0) :
+                new Vector3(defaultRotation.x, 0, defaultRotation.z) :
                 defaultRotation;
 
-            // Smoothly return to default
             targetRotation = Vector3.Lerp(targetRotation, returnTarget, returnSpeed * Time.deltaTime);
         }
     }
@@ -154,23 +227,21 @@ public class RotationLimiter : MonoBehaviour
 
     private Vector2 CalculateDragVelocity(Vector2 currentPosition)
     {
-        // Calculate time delta (avoid division by zero)
         float deltaTime = Mathf.Max(Time.time - dragTime, 0.001f);
-
-        // Calculate velocity
         return new Vector2(
-            (currentPosition.x - previousMousePosition.x) / deltaTime,
-            (currentPosition.y - previousMousePosition.y) / deltaTime
+            (currentPosition.x - previousPosition.x) / deltaTime,
+            (currentPosition.y - previousPosition.y) / deltaTime
         );
     }
 
     private void PerformQuickFlip(bool flipRight)
     {
-        // Toggle flip state
         isFlipped = !isFlipped;
 
-        // Set target rotation based on flip direction
+        // Mantener componentes X y Z al voltear
         float targetY = isFlipped ? 0 : 180;
-        targetRotation = new Vector3(0, targetY, 0);
+        targetRotation = new Vector3(defaultRotation.x, targetY, defaultRotation.z);
+
+        Debug.Log($"Carta volteada: {(isFlipped ? "Reverso" : "Frente")}");
     }
 }

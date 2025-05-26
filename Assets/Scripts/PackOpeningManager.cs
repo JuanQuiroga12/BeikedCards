@@ -379,62 +379,83 @@ public class PackOpeningManager : MonoBehaviour
     }
     private void CreateGlowEffect(GameObject cardObject)
     {
-        // Verificar si es un objeto UI o 3D
-        RectTransform cardRT = cardObject.GetComponent<RectTransform>();
-
-        if (cardRT != null)
+        try
         {
-            // Para objetos UI (con RectTransform)
-            GameObject glowObj = new GameObject("GlowEffect");
-            glowObj.transform.SetParent(cardObject.transform);
-            glowObj.transform.SetAsFirstSibling(); // Poner detrás de la carta
+            // Verificar si es un objeto UI o 3D
+            RectTransform cardRT = cardObject.GetComponent<RectTransform>();
 
-            // Configurar RectTransform
-            RectTransform glowRT = glowObj.AddComponent<RectTransform>();
-            glowRT.anchorMin = Vector2.zero;
-            glowRT.anchorMax = Vector2.one;
-            glowRT.offsetMin = new Vector2(-10f, -10f); // Extender 10px en cada dirección
-            glowRT.offsetMax = new Vector2(10f, 10f);
-
-            // Añadir componente Image
-            Image glowImage = glowObj.AddComponent<Image>();
-            glowImage.color = new Color(1f, 0.8f, 0.2f, 0.5f); // Color dorado semi-transparente
-
-            // Intentar cargar sprite para el glow
-            Sprite glowSprite = Resources.Load<Sprite>("Effects/GlowSprite");
-            if (glowSprite != null)
+            if (cardRT != null)
             {
-                glowImage.sprite = glowSprite;
-            }
+                // Para objetos UI (con RectTransform)
+                GameObject glowObj = new GameObject("GlowEffect");
+                glowObj.transform.SetParent(cardObject.transform);
+                glowObj.transform.SetAsFirstSibling(); // Poner detrás de la carta
 
-            // Añadir animación de pulsación (opcional)
-            StartCoroutine(PulseGlowEffect(glowImage));
+                // Configurar RectTransform
+                RectTransform glowRT = glowObj.AddComponent<RectTransform>();
+                glowRT.anchorMin = Vector2.zero;
+                glowRT.anchorMax = Vector2.one;
+                glowRT.offsetMin = new Vector2(-10f, -10f); // Extender 10px en cada dirección
+                glowRT.offsetMax = new Vector2(10f, 10f);
+
+                // Añadir componente Image
+                Image glowImage = glowObj.AddComponent<Image>();
+                glowImage.color = new Color(1f, 0.8f, 0.2f, 0.5f); // Color dorado semi-transparente
+
+                // Intentar cargar sprite para el glow
+                Sprite glowSprite = Resources.Load<Sprite>("Effects/GlowSprite");
+                if (glowSprite != null)
+                {
+                    glowImage.sprite = glowSprite;
+                }
+
+                // Añadir animación de pulsación (opcional)
+                StartCoroutine(PulseGlowEffect(glowImage));
+            }
+            else
+            {
+                // Para objetos 3D (sin RectTransform)
+                // Crear un objeto con material brillante alrededor del objeto 3D
+                GameObject glowObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                glowObj.transform.SetParent(cardObject.transform);
+                glowObj.transform.localPosition = Vector3.zero;
+                glowObj.transform.localScale = cardObject.transform.localScale * 1.1f; // Ligeramente más grande
+
+                // Configurar material - SOLUCIÓN AL ERROR
+                Renderer renderer = glowObj.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    // Buscar shader seguro para Android
+                    Shader shader = Shader.Find("Mobile/Diffuse");  // Usar shader mobile compatible
+
+                    // Si no hay shader, usar el shader por defecto
+                    if (shader == null)
+                    {
+                        Material glowMaterial = new Material(Shader.Find("Standard"));
+                        glowMaterial.color = Color.yellow;
+                        renderer.material = glowMaterial;
+                    }
+                    else
+                    {
+                        // Crear material con el shader encontrado
+                        Material glowMaterial = new Material(shader);
+                        glowMaterial.color = new Color(1f, 0.8f, 0.2f, 0.5f);
+                        renderer.material = glowMaterial;
+                    }
+                }
+
+                // Desactivar el collider del glow
+                Collider collider = glowObj.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
+            }
         }
-        else
+        catch (System.Exception e)
         {
-            // Para objetos 3D (sin RectTransform)
-            // Crear un objeto con material brillante alrededor del objeto 3D
-            GameObject glowObj = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            glowObj.transform.SetParent(cardObject.transform);
-            glowObj.transform.localPosition = Vector3.zero;
-            glowObj.transform.localScale = cardObject.transform.localScale * 1.1f; // Ligeramente más grande
-
-            // Configurar material
-            Renderer renderer = glowObj.GetComponent<Renderer>();
-            if (renderer != null)
-            {
-                Material glowMaterial = new Material(Shader.Find("Standard"));
-                glowMaterial.SetColor("_EmissionColor", new Color(1f, 0.8f, 0.2f, 0.5f));
-                glowMaterial.EnableKeyword("_EMISSION");
-                renderer.material = glowMaterial;
-            }
-
-            // Desactivar el collider del glow
-            Collider collider = glowObj.GetComponent<Collider>();
-            if (collider != null)
-            {
-                collider.enabled = false;
-            }
+            Debug.LogWarning($"Error creando efecto glow: {e.Message}, pero continuamos con el proceso");
+            // No detenemos la ejecución por un error en el efecto visual
         }
     }
 
@@ -479,90 +500,93 @@ public class PackOpeningManager : MonoBehaviour
     }
     private void ShowResultScreen()
     {
-
-        // Verificar componentes críticos
-        if (resultScreen == null || resultCardsContainer == null)
+        try
         {
-            Debug.LogError("Referencias faltantes para mostrar la pantalla de resultados. Verifica en el Inspector.");
-            // Volver a la escena principal como fallback
-            SceneManager.LoadScene("Scenes/MainScene");
-            return;
+            // Verificar componentes críticos
+            if (resultScreen == null || resultCardsContainer == null)
+            {
+                Debug.LogError("Referencias faltantes para mostrar la pantalla de resultados. Verifica en el Inspector.");
+                // Volver a la escena principal como fallback
+                SceneManager.LoadScene("Scenes/MainScene");
+                return;
+            }
+
+            // Cambiar a pantalla de resultados
+            cardsRevealPanel.SetActive(false);
+            resultScreen.SetActive(true);
+
+            // Configurar título
+            resultTitle.text = "¡Cartas Obtenidas!";
+
+            // Configurar layout ANTES de instanciar las cartas
+            ConfigureResultCardLayout();
+
+            // Limpiar cartas existentes
+            foreach (Transform child in resultCardsContainer)
+            {
+                Destroy(child.gameObject);
+            }
+
+            // Instanciar las cartas con ajustes adicionales
+            foreach (CardInfo card in cardsToReveal)
+            {
+                try
+                {
+                    // Crear carta resultado
+                    GameObject resultCard = Instantiate(card.resultCardPrefab, resultCardsContainer);
+
+                    // Verificar si es un objeto UI o un objeto 3D
+                    RectTransform cardRT = resultCard.GetComponent<RectTransform>();
+                    if (cardRT != null)
+                    {
+                        // Si es un objeto UI (tiene RectTransform)
+                    }
+                    else
+                    {
+                        // Si es un objeto 3D
+                        resultCard.transform.localRotation = Quaternion.Euler(90, 180, 0);
+
+                        GameObject uiContainer = new GameObject(resultCard.name + "_Container");
+                        uiContainer.transform.SetParent(resultCardsContainer);
+                        RectTransform containerRT = uiContainer.AddComponent<RectTransform>();
+                        containerRT.position = resultCard.transform.position;
+                        containerRT.sizeDelta = new Vector2(300, 400);
+
+                        resultCard.transform.SetParent(uiContainer.transform);
+                    }
+
+                    // Ajuste de colliders  
+                    BoxCollider2D boxCollider2D = resultCard.GetComponent<BoxCollider2D>();
+                    if (boxCollider2D != null) boxCollider2D.enabled = false;
+
+                    BoxCollider boxCollider3D = resultCard.GetComponent<BoxCollider>();
+                    if (boxCollider3D != null) boxCollider3D.enabled = false;
+
+                    // Crear efecto glow para cartas Deluxe
+                    if (card.rarity == CardRarity.Deluxe)
+                    {
+                        CreateGlowEffect(resultCard);
+                    }
+                }
+                catch (System.Exception e)
+                {
+                    Debug.LogWarning($"Error al crear carta resultado: {e.Message}");
+                    // Continuar con la siguiente carta
+                }
+            }
+
+            // Esperar un frame para que el layout se actualice
+            StartCoroutine(FixLayoutAfterDelay());
         }
-
-        // Cambiar a pantalla de resultados
-        cardsRevealPanel.SetActive(false);
-        resultScreen.SetActive(true);
-
-        // Cambiar color de fondo
-        Image backgroundImage = resultScreen.GetComponent<Image>();
-        if (backgroundImage != null)
-            backgroundImage.color = new Color(1f, 0.8f, 0.8f, 1f); // Rosa claro
-
-        // Configurar título
-        resultTitle.text = "¡Cartas Obtenidas!";
-
-        // Configurar layout ANTES de instanciar las cartas
-        ConfigureResultCardLayout();
-
-        // Limpiar cartas existentes
-        foreach (Transform child in resultCardsContainer)
+        catch (System.Exception e)
         {
-            Destroy(child.gameObject);
+            Debug.LogError($"Error en ShowResultScreen: {e.Message}");
         }
-
-        // Instanciar las cartas con ajustes adicionales
-        foreach (CardInfo card in cardsToReveal)
+        finally
         {
-            // Crear carta resultado
-            GameObject resultCard = Instantiate(card.resultCardPrefab, resultCardsContainer);
-
-            // Verificar si es un objeto UI o un objeto 3D
-            RectTransform cardRT = resultCard.GetComponent<RectTransform>();
-            if (cardRT != null)
-            {
-                // Si es un objeto UI (tiene RectTransform)
-            }
-            else
-            {
-                // Si es un objeto 3D
-                resultCard.transform.localRotation = Quaternion.Euler(90, 180, 0); // Rotación para que mire al frente
-
-                // Opcionalmente, crear un contenedor UI para los objetos 3D
-                GameObject uiContainer = new GameObject(resultCard.name + "_Container");
-                uiContainer.transform.SetParent(resultCardsContainer);
-                RectTransform containerRT = uiContainer.AddComponent<RectTransform>();
-                containerRT.position = resultCard.transform.position; // Mantener la posición del objeto 3D
-                containerRT.sizeDelta = new Vector2(300, 400); // Tamaño igual al de la celda
-
-                // Mover el objeto 3D al contenedor UI
-                resultCard.transform.SetParent(uiContainer.transform);
-            }
-
-            // Verificar y ajustar colliders
-            BoxCollider2D boxCollider2D = resultCard.GetComponent<BoxCollider2D>();
-            if (boxCollider2D != null)
-            {
-                boxCollider2D.enabled = false;
-            }
-
-            BoxCollider boxCollider3D = resultCard.GetComponent<BoxCollider>();
-            if (boxCollider3D != null)
-            {
-                boxCollider3D.enabled = false;
-            }
-
-            // Crear efecto glow para cartas Deluxe
-            if (card.rarity == CardRarity.Deluxe)
-            {
-                CreateGlowEffect(resultCard);
-            }
+            // IMPORTANTE: Siempre guardar las cartas, incluso si hay errores
+            SaveObtainedCards();
         }
-
-        // Esperar un frame para que el layout se actualice
-        StartCoroutine(FixLayoutAfterDelay());
-
-        // Guardar información de cartas obtenidas
-        SaveObtainedCards();
     }
 
     private IEnumerator FixLayoutAfterDelay()
@@ -747,6 +771,7 @@ public class PackOpeningManager : MonoBehaviour
                 Debug.Log($"🃏 GUARDANDO: {newCards.Count} cartas nuevas");
                 DataManager.AddCardsFromPack(newCards);
                 Debug.Log("🃏 GUARDADO COMPLETADO");
+
             }
             else
             {

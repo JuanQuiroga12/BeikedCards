@@ -203,38 +203,36 @@ public static class DataManager
             File.WriteAllText(dataPath, json);
             Debug.Log($"💾 GUARDADO EXITOSO: {userData.collectedCards.Count} cartas en {dataPath}");
 
+            dataDirty = false; // Ya está guardado
+
             // Código para Android (mantener sincronización)
 #if UNITY_ANDROID && !UNITY_EDITOR
         try {
-            // FORZAR SIEMPRE la asignación del username correcto
-            userData.username = currentUsername;
-
-            // Verificar que _cookieCodes no sea null antes de actualizar
-            if (userData._cookieCodes == null)
+            // [Mantener el código actual para Android]
+            using (AndroidJavaClass unityPlayer = new AndroidJavaClass("com.unity3d.player.UnityPlayer"))
+            using (AndroidJavaObject currentActivity = unityPlayer.GetStatic<AndroidJavaObject>("currentActivity"))
+            using (AndroidJavaObject context = currentActivity.Call<AndroidJavaObject>("getApplicationContext"))
+            using (AndroidJavaObject file = new AndroidJavaObject("java.io.File", dataPath))
+            using (AndroidJavaObject fileOutputStream = new AndroidJavaObject("java.io.FileOutputStream", file))
+            using (AndroidJavaObject outputStreamWriter = new AndroidJavaObject("java.io.OutputStreamWriter", fileOutputStream, "UTF-8"))
             {
-                userData._cookieCodes = new Dictionary<string, string>();
+                outputStreamWriter.Call("write", json);
+                outputStreamWriter.Call("flush");
+                outputStreamWriter.Call("close");
+                fileOutputStream.Call("close");
             }
+            Debug.Log($"💾 GUARDADO ANDROID EXITOSO: {userData.collectedCards.Count} cartas en {dataPath}");
 
-            // Actualizar lista serializable
-            userData.UpdateCookieCodesList();
 
-            // Actualizar lista serializable
-            userData.UpdateCookieCodesList();
 
-            // Generar JSON
-            string json = JsonUtility.ToJson(userData);
-            Debug.Log($"💾 GUARDANDO: Datos para usuario {currentUsername}. JSON: {json.Substring(0, Mathf.Min(100, json.Length))}...");
-
-            // Guardar en PlayerPrefs como respaldo
-            PlayerPrefs.SetString(currentUsername + "_Backup", json);
-            PlayerPrefs.Save();
-
-            // Método simplificado para guardar archivo
-            File.WriteAllText(dataPath, json);
-            Debug.Log($"💾 GUARDADO EXITOSO: {userData.collectedCards.Count} cartas en {dataPath}");
         }
         catch (System.Exception e) {
             Debug.LogError($"⚠️ ERROR ANDROID: {e.Message}");
+            Debug.LogError($"⚠️ ERROR ANDROID: {e.StackTrace}");
+            // Si falla, guardar en PlayerPrefs como último recurso
+            PlayerPrefs.SetString(currentUsername + "_Backup", json);
+            PlayerPrefs.Save();
+            Debug.Log($"💾 GUARDADO EN PLAYERPREFS: {userData.collectedCards.Count} cartas como respaldo en PlayerPrefs");
         }
 #endif
         }
@@ -246,6 +244,12 @@ public static class DataManager
 
     public static void LoadData()
     {
+        if (dataDirty)
+        {
+            Debug.LogWarning("Se intentó recargar datos cuando hay cambios no guardados. Se omite LoadData para no perder datos.");
+            return;
+        }
+
         try
         {
             Debug.Log($"📂 CARGANDO: Datos de usuario {currentUsername} desde {dataPath}");
@@ -326,6 +330,8 @@ public static class DataManager
     }
 
     // Método para añadir cartas obtenidas en el pack opening
+    private static bool dataDirty = false; // NUEVO
+
     public static void AddCardsFromPack(List<Card> cards)
     {
         // Verificar que userData no sea nulo
@@ -339,7 +345,6 @@ public static class DataManager
             {
                 Debug.LogError("No se pudo inicializar userData. Creando nuevo objeto...");
                 userData = new UserData();
-                userData.username = currentUsername;
             }
         }
 
@@ -370,6 +375,7 @@ public static class DataManager
                 userData.collectedCards.Add(card);
             }
         }
+        dataDirty = true; // Marcar como modificado
         SaveData();
     }
     public static List<Card> GetAllCards()

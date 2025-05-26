@@ -10,8 +10,10 @@ public class CollectionManager : MonoBehaviour
     [SerializeField] private GameObject storyCollectionPrefab;
     [SerializeField] private Button backButton;
     [SerializeField] private GameObject emptyCollectionMessage;
+    [SerializeField] private Button scanQRButton; // NUEVO: Referencia al botón de escaneo
 
-    // Definiciуn de historias disponibles
+
+    // Definición de historias disponibles
     private Dictionary<string, string> storyNames = new Dictionary<string, string>
     {
         { "story_1", "Crónicas de una familia dulce" },
@@ -61,6 +63,20 @@ public class CollectionManager : MonoBehaviour
 
         if (emptyCollectionMessage == null)
             Debug.LogError("Error: EmptyCollectionMessage no está asignado en el Inspector");
+
+        // NUEVO: Verificar botón de escaneo QR
+        if (scanQRButton == null)
+        {
+            // Intentar encontrar el botón dentro del mensaje de colección vacía
+            if (emptyCollectionMessage != null)
+            {
+                scanQRButton = emptyCollectionMessage.GetComponentInChildren<Button>();
+                if (scanQRButton == null)
+                    Debug.LogWarning("No se encontró botón ScanQR en el mensaje de colección vacía");
+            }
+            else
+                Debug.LogWarning("Button ScanQR no está asignado en el Inspector");
+        }
     }
 
     private void Start()
@@ -83,6 +99,13 @@ public class CollectionManager : MonoBehaviour
         else
             Debug.LogWarning("BackButton no asignado, no se puede configurar la navegación de retorno");
 
+        // NUEVO: Configurar botón de escaneo QR
+        if (scanQRButton != null)
+        {
+            scanQRButton.onClick.AddListener(NavigateToQRScan);
+            Debug.Log("Botón ScanQR configurado correctamente");
+        }
+
         // Añadir un retardo antes de cargar las colecciones para dar tiempo al sistema de archivos
         Invoke("LoadCollectionsWithDelay", 0.5f);
 
@@ -92,6 +115,13 @@ public class CollectionManager : MonoBehaviour
         // Cargar todas las colecciones
         LoadCollections();
 
+    }
+
+    // NUEVO: Método para navegar a la escena de escaneo QR
+    private void NavigateToQRScan()
+    {
+        Debug.Log("Navegando a escena de escaneo QR...");
+        SceneManager.LoadScene("QRScanScene");
     }
 
     private void LoadCollectionsWithDelay()
@@ -274,6 +304,38 @@ public class CollectionManager : MonoBehaviour
             {
                 Debug.LogWarning($"Prefab no encontrado: Cards/{cardMapping.Value}");
             }
+        }
+    }
+
+    // NUEVO: Animación de pulso para el botón de escaneo
+    private System.Collections.IEnumerator PulseButton(GameObject button)
+    {
+        RectTransform rt = button.GetComponent<RectTransform>();
+        Vector3 originalScale = rt.localScale;
+        float pulseTime = 1.5f;
+
+        while (emptyCollectionMessage.activeSelf)
+        {
+            // Aumentar tamaño
+            float t = 0;
+            while (t < pulseTime / 2)
+            {
+                t += Time.deltaTime;
+                float scale = 1.0f + Mathf.Sin(t / pulseTime * Mathf.PI) * 0.1f;
+                rt.localScale = originalScale * scale;
+                yield return null;
+            }
+
+            // Disminuir tamaño
+            while (t < pulseTime)
+            {
+                t += Time.deltaTime;
+                float scale = 1.0f + Mathf.Sin(t / pulseTime * Mathf.PI) * 0.1f;
+                rt.localScale = originalScale * scale;
+                yield return null;
+            }
+
+            yield return new WaitForSeconds(0.5f);
         }
     }
 
